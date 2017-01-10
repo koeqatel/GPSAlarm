@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--Cancel and Save buttons-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="cancelNewAlarmButton"
+            android:text="Cancel" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="saveNewAlarmButton"
+            android:text="Save" />
+    </LinearLayout>
+
+    <!--Shizzle-->
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <!--Buttons-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!--Top buttons (Up)-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="8">
+
+                <Button
+                    android:id="@+id/timeUpHourButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@null"
+                    android:onClick="timeUpHourButton"
+                    android:text="▲" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/timeUpMinuteButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@null"
+                    android:onClick="timeUpMinuteButton"
+                    android:text="▲" />
+
+            </LinearLayout>
+
+            <!--The time textviews-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="8">
+
+                <Button
+                    android:id="@+id/timeHourButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="2"
+                    android:background="@null"
+                    android:text="06"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text=":"
+                    android:textAlignment="center" />
+
+                <Button
+                    android:id="@+id/timeMinuteButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="2"
+                    android:background="@null"
+                    android:text="00"
+                    android:textAlignment="center" />
+            </LinearLayout>
+
+            <!--Top buttons (Up)-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="8">
+
+                <Button
+                    android:id="@+id/timeDownHourButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@null"
+                    android:onClick="timeDownHourButton"
+                    android:text="▼" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/timeDownMinuteButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:background="@null"
+                    android:onClick="timeDownMinuteButton"
+                    android:text="▼" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Alarm type"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/typeContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/typeButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Alarm type" />
+        </LinearLayout>
+
+        <!--Alarm Info-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Name of the alarm"
+                android:textAlignment="center" />
+
+            <EditText
+                android:id="@+id/alarmName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:singleLine="true"
+                android:text="" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <Button
+                    android:id="@+id/dailyButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="dailyButton"
+                    android:text="Daily" />
+
+                <Button
+                    android:id="@+id/timeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Time" />
+
+                <Button
+                    android:id="@+id/dateButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="dateButton"
+                    android:text="Date" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Alarm goes off at:"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/dateContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="3" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <Button
+            android:id="@+id/toneButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Alarm tone: "
+            android:textAlignment="textStart" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volume" />
+
+        <SeekBar
+            android:id="@+id/volumeBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="75" />
+
+        <Button
+            android:id="@+id/locationButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Location" />
+    </LinearLayout>
+
+</LinearLayout>
