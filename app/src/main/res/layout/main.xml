@@ -3,36 +3,29 @@
     android:id="@+id/MainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#333333"
     android:orientation="vertical"
+    android:paddingBottom="10dp"
     android:paddingLeft="10dp"
-    android:paddingRight="10dp" >
+    android:paddingRight="10dp"
+    android:paddingTop="10dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="12">
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="10" />
-
-        <Button
-            android:id="@+id/AddDateTimeButton"
-            android:layout_width="0dp"
-            android:layout_height="20pt"
-            android:layout_weight="2"
-            android:onClick="AddDateTimeButton"
-            android:text="+" />
-    </LinearLayout>
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true">
-    </ListView>
+        android:layout_alignParentTop="true"
+        android:layout_weight="1"></ListView>
 
+
+    <Button
+        android:id="@+id/AddDateTimeButton"
+        android:layout_width="25pt"
+        android:layout_height="25pt"
+        android:layout_gravity="right"
+        android:background="@drawable/button_bg_round"
+        android:onClick="AddDateTimeButton"
+        android:text="➕"/>
 </LinearLayout>

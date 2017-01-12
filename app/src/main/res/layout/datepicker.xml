@@ -2,7 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#333333"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp">
 
     <!--Cancel and Save buttons-->
     <LinearLayout
@@ -17,7 +22,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="cancelButton"
-            android:text="Cancel" />
+            android:text="Cancel"
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/saveCalButton"
@@ -25,7 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="saveButton"
-            android:text="Save" />
+            android:text="Save"
+            android:textColor="#ffffff" />
     </LinearLayout>
 
     <LinearLayout
@@ -37,6 +44,7 @@
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="375dp"/>
+        //TODO maak Calandar text wit
     </LinearLayout>
 
     <LinearLayout
@@ -52,7 +60,8 @@
                 android:id="@+id/calDateText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="No dates selected"/>
+                android:text="No dates selected"
+                android:textColor="#ffffff" />
         </ScrollView>
     </LinearLayout>
 </LinearLayout>

@@ -16,7 +16,8 @@
             android:layout_height="30dp"
             android:layout_weight="3"
             android:paddingTop="10dp"
-            android:text="Time" />
+            android:text="Time"
+            android:textColor="#ffffff" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -32,13 +33,15 @@
                 android:id="@+id/nameText"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:text="Name" />
+                android:text="Name"
+                android:textColor="#ffffff" />
 
             <TextView
                 android:id="@+id/datetext"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:text="Date" />
+                android:text="Date"
+                android:textColor="#ffffff" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

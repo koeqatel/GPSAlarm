@@ -2,7 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#333333"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp">
 
     <!--Cancel and Save buttons-->
     <LinearLayout
@@ -48,12 +53,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="7"
+                android:textColor="#ffffff"
                 android:text="Sunday"/>
-
+<!--TODO Checkboxes zijn ontzichtbaar-->
             <CheckBox
                 android:id="@+id/checkBoxSunday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#ffffff"
                 android:layout_weight="1" />
         </LinearLayout>
 
@@ -67,6 +74,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#ffffff"
                 android:layout_gravity="center"
                 android:layout_weight="7"
                 android:text="Monday" />
@@ -88,6 +96,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#ffffff"
                 android:layout_gravity="center"
                 android:layout_weight="7"
                 android:text="Tuesday" />
@@ -109,6 +118,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#ffffff"
                 android:layout_gravity="center"
                 android:layout_weight="7"
                 android:text="Wednesday" />
@@ -129,6 +139,7 @@
 
             <TextView
                 android:layout_width="match_parent"
+                android:textColor="#ffffff"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="7"
@@ -151,6 +162,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#ffffff"
                 android:layout_gravity="center"
                 android:layout_weight="7"
                 android:text="Friday" />
@@ -172,6 +184,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#ffffff"
                 android:layout_gravity="center"
                 android:layout_weight="7"
                 android:text="Saterday" />
