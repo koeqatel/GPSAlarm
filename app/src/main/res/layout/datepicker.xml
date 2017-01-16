@@ -9,59 +9,49 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp">
 
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="375dp"/>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/calDateText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No dates selected" />
+    </ScrollView>
+
     <!--Cancel and Save buttons-->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/cancelCalButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/button_bg_round"
             android:onClick="cancelButton"
-            android:text="Cancel"
-            android:textColor="#ffffff" />
+            android:text="✖"
+            android:textColor="#ff0000"
+            android:textSize="20dp" />
 
         <Button
             android:id="@+id/saveCalButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/button_bg_round"
             android:onClick="saveButton"
-            android:text="Save"
-            android:textColor="#ffffff" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <CalendarView
-            android:id="@+id/calendarView"
-            android:layout_width="match_parent"
-            android:layout_height="375dp"/>
-        //TODO maak Calandar text wit
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/calDateText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="No dates selected"
-                android:textColor="#ffffff" />
-        </ScrollView>
-    </LinearLayout>
+            android:text="✔"
+            android:textColor="#007d00"
+            android:textSize="20dp" />
+    </RelativeLayout>
 </LinearLayout>

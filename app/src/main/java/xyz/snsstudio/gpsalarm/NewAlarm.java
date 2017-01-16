@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -292,6 +293,9 @@ public class NewAlarm extends Activity {
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("Pick day(s) to repeat");
         dialog.setContentView(R.layout.datepicker);
+
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_box);
+
 
         java.util.Calendar c = java.util.Calendar.getInstance();
         CalendarView cv = (CalendarView) dialog.findViewById(R.id.calendarView);
