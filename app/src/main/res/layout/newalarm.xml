@@ -94,6 +94,7 @@
                 <Button
                     android:id="@+id/timeHourButton"
                     android:layout_width="0dp"
+                    android:onClick="timeHourButton"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="2"
@@ -114,6 +115,7 @@
                 <Button
                     android:id="@+id/timeMinuteButton"
                     android:layout_width="0dp"
+                    android:onClick="timeMinuteButton"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="2"
@@ -213,6 +215,7 @@
                 android:layout_weight="1"
                 android:onClick="dailyButton"
                 android:text="Daily"
+                android:background="@drawable/button_bg_rectangle"
                 android:textColor="#ffffff" />
 
             <!--<Button-->
@@ -228,6 +231,7 @@
                 android:layout_weight="1"
                 android:onClick="dateButton"
                 android:text="Date"
+                android:background="@drawable/button_bg_rectangle"
                 android:textColor="#ffffff" />
         </LinearLayout>
 
@@ -263,6 +267,7 @@
             android:onClick="AlarmTone"
             android:text="Alarm tone: "
             android:textAlignment="textStart"
+            android:background="@drawable/button_bg_rectangle"
             android:textColor="#ffffff" />
 
         <TextView
@@ -282,6 +287,7 @@
             android:id="@+id/locationButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/button_bg_rectangle"
             android:layout_weight="1"
             android:onClick="LocationClick"
             android:text="Location"

@@ -9,23 +9,10 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp">
 
-    <CalendarView
-        android:id="@+id/calendarView"
+    <TimePicker
+        android:id="@+id/timePicker"
         android:layout_width="match_parent"
-        android:layout_height="375dp"/>
-
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/calDateText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="No dates selected" />
-    </ScrollView>
+        android:layout_height="wrap_content" />
 
     <!--Cancel and Save buttons-->
     <RelativeLayout
@@ -34,7 +21,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/cancelCalButton"
+            android:id="@+id/cancelButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/button_bg_round"
@@ -44,7 +31,7 @@
             android:textSize="20dp" />
 
         <Button
-            android:id="@+id/saveCalButton"
+            android:id="@+id/saveButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentRight="true"

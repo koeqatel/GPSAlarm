@@ -3,34 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#b9b9b9"
     android:paddingBottom="10dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
     android:paddingTop="10dp">
-
-    <!--Cancel and Save buttons-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2">
-
-        <Button
-            android:id="@+id/cancelButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="cancelButton"
-            android:text="Cancel" />
-
-        <Button
-            android:id="@+id/saveButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="saveButton"
-            android:text="Save" />
-    </LinearLayout>
 
     <!--Days of week-->
 
@@ -187,4 +164,32 @@
                 android:layout_weight="1" />
         </LinearLayout>
     </LinearLayout>
+
+    <!--Cancel and Save buttons-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/button_bg_round"
+            android:onClick="cancelButton"
+            android:text="✖"
+            android:textColor="#ff0000"
+            android:textSize="20dp" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/button_bg_round"
+            android:onClick="saveButton"
+            android:text="✔"
+            android:textColor="#007d00"
+            android:textSize="20dp" />
+    </RelativeLayout>
 </LinearLayout>

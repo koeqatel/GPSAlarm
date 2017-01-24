@@ -1,17 +1,13 @@
 package xyz.snsstudio.gpsalarm;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.CursorLoader;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -20,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.app.Activity;
 import android.widget.Toast;
+
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -37,13 +34,14 @@ import java.util.Collections;
 import java.util.Date;
 
 public class NewAlarm extends Activity {
-    //    String Date;
     public int Hours = 6;
     public int Minutes = 0;
     public JSONObject Json = new JSONObject();
     public ArrayList<String> TempSaveList = new ArrayList<>();
     String FName;
     String DaysOfWeek = "";
+    public String Date = "1-1-1970";
+    static final int PICK_CONTACT_REQUEST = 1;  // The request code
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +71,25 @@ public class NewAlarm extends Activity {
         Intent intent = new Intent(this, MultiColumnActivity.class);
         finish();
         startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == PICK_CONTACT_REQUEST) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                System.out.println(data.getData().toString());
+                Button tb = (Button) findViewById(R.id.toneButton);
+                try {
+                    FName = getRealPathFromURI(data.getData());
+                    String[] UFFName = FName.split("/");
+                    tb.setText("Alarm tone: " + UFFName[UFFName.length - 1]);
+                } catch (Exception Ex) {
+                    Toast.makeText(this, "Error: " + Ex + "\n" + FName, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     //region TimeButtons
@@ -138,7 +155,8 @@ public class NewAlarm extends Activity {
             Minute.setText(Integer.toString(Minutes));
         }
     }
-//endregion
+
+    //endregion
 
     public void cancelNewAlarmButton(View view) {
         finish();
@@ -146,7 +164,7 @@ public class NewAlarm extends Activity {
         startActivity(intent);
     }
 
-    public void saveNewAlarmButton(View view) throws JSONException, IOException {
+    public void saveNewAlarmButton(View view) throws JSONException {
         //TODO check if total time in millis is bigger than current time in millies, if not show toast about time in past not being possible.
         File Root = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/");
         File file = new File(Root, "Alarms.json");
@@ -284,11 +302,6 @@ public class NewAlarm extends Activity {
 
     }
 
-    public String CalDay = "1";
-    public String CalMonth = "1";
-    public String CalYear = "1970";
-    public String Date = "1-1-1970";
-
     public void dateButton(View view) {
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("Pick day(s) to repeat");
@@ -297,9 +310,9 @@ public class NewAlarm extends Activity {
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_box);
 
 
-        java.util.Calendar c = java.util.Calendar.getInstance();
+        Calendar c = Calendar.getInstance();
         CalendarView cv = (CalendarView) dialog.findViewById(R.id.calendarView);
-        cv.setFirstDayOfWeek(java.util.Calendar.SUNDAY);
+        cv.setFirstDayOfWeek(Calendar.SUNDAY);
         cv.setMinDate(c.getTimeInMillis() - 1200);
 
         CalendarView calendarView = (CalendarView) dialog.findViewById(R.id.calendarView);
@@ -367,6 +380,8 @@ public class NewAlarm extends Activity {
         dialog.setTitle("Pick day(s) to repeat");
         dialog.setContentView(R.layout.repeatdays);
 
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_box);
+
         //region SaveButton
         Button saveButton = (Button) dialog.findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -421,32 +436,12 @@ public class NewAlarm extends Activity {
         setContentView(R.layout.newalarm);
     }
 
-    static final int PICK_CONTACT_REQUEST = 1;  // The request code
-
     public void AlarmTone(View view) {
 //        Toast.makeText(this, "Working on it!", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_CONTACT_REQUEST);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == PICK_CONTACT_REQUEST) {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                System.out.println(data.getData().toString());
-                Button tb = (Button) findViewById(R.id.toneButton);
-                try {
-                    FName = getRealPathFromURI(data.getData());
-                    String[] UFFName = FName.split("/");
-                    tb.setText("Alarm tone: " + UFFName[UFFName.length - 1]);
-                } catch (Exception Ex) {
-                    Toast.makeText(this, "Error: " + Ex + "\n" + FName, Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
 
     public String getRealPathFromURI(Uri contentUri) {
         String res = "";
@@ -531,5 +526,4 @@ public class NewAlarm extends Activity {
 
         }
     }
-
 }
