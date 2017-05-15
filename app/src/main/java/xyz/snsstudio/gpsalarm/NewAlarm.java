@@ -36,7 +36,7 @@ public class NewAlarm extends Activity {
     public int Minutes = 0;
     public JSONObject Json = new JSONObject();
     public ArrayList<String> TempSaveList = new ArrayList<>();
-    String FName;
+    String FName = "";
     String DaysOfWeek = "";
     String Date;
     int AlarmType = 0; //0 = notification, 1 = sound, 2 = vibrate and sound
@@ -104,7 +104,7 @@ public class NewAlarm extends Activity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, MultiColumnActivity.class);
+        Intent intent = new Intent(this, Main.class);
         finish();
         startActivity(intent);
     }
@@ -210,7 +210,7 @@ public class NewAlarm extends Activity {
 
     public void cancelNewAlarmButton_click(View view) {
         finish();
-        Intent intent = new Intent(this, MultiColumnActivity.class);
+        Intent intent = new Intent(this, Main.class);
         startActivity(intent);
     }
 
@@ -352,7 +352,7 @@ public class NewAlarm extends Activity {
         }
         //endregion
 
-        Intent intent = new Intent(this, MultiColumnActivity.class);
+        Intent intent = new Intent(this, Main.class);
         setResult(RESULT_OK, intent);
         finish();
         startActivity(intent);

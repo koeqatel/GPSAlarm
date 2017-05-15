@@ -27,7 +27,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MultiColumnActivity extends Activity {
+public class Main extends Activity {
 
     private ArrayList<HashMap> list;
 
@@ -46,7 +46,7 @@ public class MultiColumnActivity extends Activity {
         //region CreateList
         ListView lview = (ListView) findViewById(android.R.id.list);
         populateList();
-        final listviewAdapter adapter = new listviewAdapter(this, list);
+        final lvAdapter adapter = new lvAdapter(this, list);
         lview.setAdapter(adapter);
         lview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -68,7 +68,7 @@ public class MultiColumnActivity extends Activity {
 
         alert.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                Toast.makeText(MultiColumnActivity.this, "Fix Edit", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Main.this, "Fix Edit", Toast.LENGTH_SHORT).show();
                 //Read file in while loop, make json object, Add object content with Id via Intent
                 File file = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/", "Alarms.json");
 
@@ -77,6 +77,7 @@ public class MultiColumnActivity extends Activity {
                     BufferedReader br = new BufferedReader(new FileReader(file));
                     String line;
                     //Read file line by line
+                    Intent intent = new Intent(Main.this, NewAlarm.class);
                     while ((line = br.readLine()) != null) {
                         JSONObject obj = new JSONObject(line);
                         int id = obj.getInt("Id");
@@ -92,7 +93,6 @@ public class MultiColumnActivity extends Activity {
                             String Location = obj.getString("Location");
 
 
-                            Intent intent = new Intent(MultiColumnActivity.this, NewAlarm.class);
                             intent.putExtra("Id", Id);
                             intent.putExtra("Hour", Hour);
                             intent.putExtra("Minute", Minute);
@@ -102,10 +102,10 @@ public class MultiColumnActivity extends Activity {
                             intent.putExtra("Volume", Volume);
                             intent.putExtra("Type", Type);
                             intent.putExtra("Location", Location);
-                            startActivity(intent);
                         }
                     }
                     br.close();
+                    startActivity(intent);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -153,7 +153,7 @@ public class MultiColumnActivity extends Activity {
                 //TODO find a legit way instead of this evil workaround
 
                 finish();
-                Intent intent = new Intent(MultiColumnActivity.this, MultiColumnActivity.class);
+                Intent intent = new Intent(Main.this, Main.class);
                 startActivity(intent);
             }
         });

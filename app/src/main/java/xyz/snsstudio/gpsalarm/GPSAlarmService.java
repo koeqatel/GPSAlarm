@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -38,7 +37,7 @@ public class GPSAlarmService extends Service {
                 Calendar c = Calendar.getInstance();
                 int Second = c.get(Calendar.SECOND);
                 if (Second == 0) {
-                    int Type = 0;
+                    int Type;
                     int Minute = c.get(Calendar.MINUTE);
                     int Hour = c.get(Calendar.HOUR_OF_DAY);
                     int curDay = c.get(Calendar.DAY_OF_MONTH);
@@ -48,6 +47,8 @@ public class GPSAlarmService extends Service {
                     String curWeekDayName = new DateFormatSymbols().getWeekdays()[curWeekDay];
                     String curDayS;
                     String curMonthS;
+
+
                     if (curDay < 10)
                         curDayS = "0" + curDay;
                     else
@@ -72,6 +73,7 @@ public class GPSAlarmService extends Service {
                     }
 
                     final String CurrentTime = Hourstring + ":" + Minutestring;
+
                     //region ReadFile
                     try {
                         File file = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/", "Alarms.json");
@@ -124,7 +126,7 @@ public class GPSAlarmService extends Service {
     }
 
     public void showNotification(String Alarmname) {
-        PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, MultiColumnActivity.class), 0);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, Main.class), 0);
         Notification notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.ic_menu_report_image)
                 .setContentTitle(Alarmname)

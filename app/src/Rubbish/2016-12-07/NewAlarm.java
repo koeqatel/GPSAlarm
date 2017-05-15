@@ -255,7 +255,7 @@ public class NewAlarm extends Activity {
         }
         //endregion
 
-        //Go back to MultiColumnActivity
+        //Go back to Main
         Intent intent = new Intent(this, MultiColumnActivity.class);
 
         setResult(RESULT_OK, intent);

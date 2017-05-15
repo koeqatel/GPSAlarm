@@ -18,12 +18,12 @@ import static xyz.snsstudio.gpsalarm.Constant.REPEAT_TEXT;
  *
  * @author Paresh N. Mayani
  */
-public class listviewAdapter extends BaseAdapter
+public class lvAdapter extends BaseAdapter
 {
     public ArrayList<HashMap> list;
     Activity activity;
 
-    public listviewAdapter(Activity activity, ArrayList<HashMap> list) {
+    public lvAdapter(Activity activity, ArrayList<HashMap> list) {
         super();
         this.activity = activity;
         this.list = list;

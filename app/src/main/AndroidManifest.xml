@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MultiColumnActivity"
+            android:name=".Main"
             android:noHistory="true"
             android:screenOrientation="portrait">
             <intent-filter>
