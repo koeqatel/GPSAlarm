@@ -19,17 +19,10 @@
         android:text=""
         android:textColor="#ffffff"
         android:textColorHint="#dddddd" />
-    <!--Shizzle-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="horizontal"-->
-    <!--android:paddingLeft="10dp"-->
-    <!--android:paddingRight="10dp"-->
-    <!--android:weightSum="2">-->
 
     <!--Buttons-->
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -62,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@null"
-                    android:onClick="timeUpHourButton"
+                    android:onClick="timeUpHourButton_click"
                     android:text="▲"
                     android:textColor="#ffffff" />
 
@@ -77,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@null"
-                    android:onClick="timeUpMinuteButton"
+                    android:onClick="timeUpMinuteButton_click"
                     android:text="▲"
                     android:textColor="#ffffff" />
 
@@ -94,11 +87,11 @@
                 <Button
                     android:id="@+id/timeHourButton"
                     android:layout_width="0dp"
-                    android:onClick="timeHourButton"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="2"
                     android:background="@null"
+                    android:onClick="timeHourButton_click"
                     android:text="06"
                     android:textAlignment="center"
                     android:textColor="#ffffff" />
@@ -115,11 +108,11 @@
                 <Button
                     android:id="@+id/timeMinuteButton"
                     android:layout_width="0dp"
-                    android:onClick="timeMinuteButton"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="2"
                     android:background="@null"
+                    android:onClick="timeMinuteButton_click"
                     android:text="00"
                     android:textAlignment="center"
                     android:textColor="#ffffff" />
@@ -139,7 +132,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@null"
-                    android:onClick="timeDownHourButton"
+                    android:onClick="timeDownHourButton_click"
                     android:text="▼"
                     android:textColor="#ffffff" />
 
@@ -154,7 +147,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:background="@null"
-                    android:onClick="timeDownMinuteButton"
+                    android:onClick="timeDownMinuteButton_click"
                     android:text="▼"
                     android:textColor="#ffffff" />
 
@@ -191,7 +184,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="AlarmType"
+            android:background="@drawable/button_bg_rectangle"
+            android:onClick="alarmTypeButton_click"
             android:text="Alarm type"
             android:textColor="#ffffff" />
     </LinearLayout>
@@ -213,9 +207,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:onClick="dailyButton"
-                android:text="Daily"
                 android:background="@drawable/button_bg_rectangle"
+                android:onClick="dailyButton_click"
+                android:text="Daily"
                 android:textColor="#ffffff" />
 
             <!--<Button-->
@@ -229,9 +223,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:onClick="dateButton"
-                android:text="Date"
                 android:background="@drawable/button_bg_rectangle"
+                android:onClick="dateButton_click"
+                android:text="Date"
                 android:textColor="#ffffff" />
         </LinearLayout>
 
@@ -250,7 +244,7 @@
             android:textColor="#ffffff" />
 
 
-    </LinearLayout><!--</LinearLayout>-->
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -264,10 +258,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="AlarmTone"
-            android:text="Alarm tone: "
-            android:textAlignment="textStart"
             android:background="@drawable/button_bg_rectangle"
+            android:onClick="alarmToneButton_click"
+            android:text=" Alarm tone: "
+            android:textAlignment="textStart"
             android:textColor="#ffffff" />
 
         <TextView
@@ -287,9 +281,9 @@
             android:id="@+id/locationButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_bg_rectangle"
             android:layout_weight="1"
-            android:onClick="LocationClick"
+            android:background="@drawable/button_bg_rectangle"
+            android:onClick="locationButton_click"
             android:text="Location"
             android:textColor="#ffffff" />
     </LinearLayout>
@@ -311,7 +305,7 @@
             android:layout_height="60dp"
             android:layout_alignParentLeft="true"
             android:background="@drawable/button_bg_round"
-            android:onClick="cancelNewAlarmButton"
+            android:onClick="cancelNewAlarmButton_click"
             android:text="✖"
             android:textColor="#ff0000"
             android:textSize="30dp" />
@@ -322,7 +316,7 @@
             android:layout_height="60dp"
             android:layout_alignParentRight="true"
             android:background="@drawable/button_bg_round"
-            android:onClick="saveNewAlarmButton"
+            android:onClick="saveNewAlarmButton_click"
             android:text="✔"
             android:textColor="#007d00"
             android:textSize="20dp" />

@@ -39,6 +39,7 @@ public class MultiColumnActivity extends Activity {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "GPSAlarmService");
         wakeLock.acquire();
         //TODO This feels dirty
+        //Thats because it is...
 
         startService(new Intent(this, GPSAlarmService.class));
 

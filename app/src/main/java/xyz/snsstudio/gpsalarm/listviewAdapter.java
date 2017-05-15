@@ -58,7 +58,7 @@ public class listviewAdapter extends BaseAdapter
 
         if (convertView == null)
         {
-            convertView = inflater.inflate(R.layout.listlayout, null);
+            convertView = inflater.inflate(R.layout.dialog_listlayout, null);
             holder = new ViewHolder();
             holder.txtFirst = (TextView) convertView.findViewById(R.id.timeText);
             holder.txtSecond = (TextView) convertView.findViewById(R.id.nameText);

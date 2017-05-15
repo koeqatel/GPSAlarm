@@ -38,7 +38,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/button_bg_round"
-            android:onClick="cancelButton"
+            android:onClick="cancelButton_click"
             android:text="✖"
             android:textColor="#ff0000"
             android:textSize="20dp" />
@@ -49,7 +49,7 @@
             android:layout_height="40dp"
             android:layout_alignParentRight="true"
             android:background="@drawable/button_bg_round"
-            android:onClick="saveButton"
+            android:onClick="saveButton_click"
             android:text="✔"
             android:textColor="#007d00"
             android:textSize="20dp" />

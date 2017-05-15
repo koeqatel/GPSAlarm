@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static java.lang.Integer.parseInt;
+
 public class GPSAlarmService extends Service {
     public String pubHour = "";
     public String pubMinute = "";
@@ -35,6 +38,7 @@ public class GPSAlarmService extends Service {
                 Calendar c = Calendar.getInstance();
                 int Second = c.get(Calendar.SECOND);
                 if (Second == 0) {
+                    int Type = 0;
                     int Minute = c.get(Calendar.MINUTE);
                     int Hour = c.get(Calendar.HOUR_OF_DAY);
                     int curDay = c.get(Calendar.DAY_OF_MONTH);
@@ -43,13 +47,19 @@ public class GPSAlarmService extends Service {
                     int curWeekDay = c.get(Calendar.DAY_OF_WEEK);
                     String curWeekDayName = new DateFormatSymbols().getWeekdays()[curWeekDay];
                     String curDayS;
+                    String curMonthS;
                     if (curDay < 10)
                         curDayS = "0" + curDay;
                     else
-                        curDayS =  "" + curDay;
+                        curDayS = "" + curDay;
+
+                    if (curMonth < 10)
+                        curMonthS = "0" + curMonth;
+                    else
+                        curMonthS = "" + curMonth;
 
 
-                    String CurrentDate = curDayS + "-" + curMonth + "-" + curYear;
+                    String CurrentDate = curDayS + "-" + curMonthS + "-" + curYear;
                     String Hourstring = Integer.toString(Hour);
                     String Minutestring = Integer.toString(Minute);
 
@@ -73,6 +83,8 @@ public class GPSAlarmService extends Service {
                             JSONObject obj = new JSONObject(line);
                             pubHour = obj.getString("Hour").toString();
                             pubMinute = obj.getString("Minute").toString();
+                            Type = parseInt(obj.getString("Type"));
+
                             String AlarmTime = pubHour + ":" + pubMinute;
                             AlarmDate = obj.getString("Date").toString();
 
@@ -80,21 +92,17 @@ public class GPSAlarmService extends Service {
                             int i = 0;
                             //TODO ask for type, if type is notification run "showNotification" else run "showAlarm"
                             while (i < Date.size()) {
-                                if (CurrentDate.equals(Date.get(i))) {
+                                if (CurrentDate.equals(Date.get(i)) || curWeekDayName.equals(Date.get(i))) {
                                     if (CurrentTime.equals(AlarmTime)) {
-//                                        showNotification();
-                                        showAlarm(obj.getString("Tone"));
-                                        break;
+                                        if (Type == 0 || Type == 2) {
+                                            showNotification(obj.getString("Name"));
+                                        } else if (Type == 1 || Type == 2) {
+                                            showAlarm(obj.getString("Name"), obj.getString("Tone"));
+                                            break;
+                                        }
                                     }
+                                    i++;
                                 }
-                                else if (curWeekDayName.equals(Date.get(i))) {
-                                    if (CurrentTime.equals(AlarmTime)) {
-//                                        showNotification();
-                                        showAlarm(obj.getString("Tone"));
-                                        break;
-                                    }
-                                }
-                                i++;
                             }
                         }
                         br.close();
@@ -115,11 +123,11 @@ public class GPSAlarmService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public void showNotification() {
+    public void showNotification(String Alarmname) {
         PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, MultiColumnActivity.class), 0);
         Notification notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                .setContentTitle("Alarm went off")
+                .setContentTitle(Alarmname)
                 .setContentText(AlarmDate + " " + pubHour + ":" + pubMinute)
                 .setContentIntent(pi)
                 .setAutoCancel(true)
@@ -129,11 +137,12 @@ public class GPSAlarmService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(0, notification);
     }
-    public void showAlarm(String Tone) {
-        //TODO does not run if app is closed.
+
+    public void showAlarm(String Alarmname, String Tone) {
         Intent dialogIntent = new Intent(this, Alarm.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        dialogIntent.putExtra("Name", Alarmname);
         dialogIntent.putExtra("Tone", Tone);
-        this.startActivity(dialogIntent);
+        startActivity(dialogIntent);
     }
 }

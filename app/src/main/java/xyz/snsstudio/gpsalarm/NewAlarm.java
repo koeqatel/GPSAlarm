@@ -1,7 +1,6 @@
 package xyz.snsstudio.gpsalarm;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,7 +17,6 @@ import android.app.Activity;
 import android.widget.Toast;
 
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -40,8 +38,8 @@ public class NewAlarm extends Activity {
     public ArrayList<String> TempSaveList = new ArrayList<>();
     String FName;
     String DaysOfWeek = "";
-    public String Date = "1-1-1970";
-    static final int PICK_CONTACT_REQUEST = 1;  // The request code
+    String Date;
+    int AlarmType = 0; //0 = notification, 1 = sound, 2 = vibrate and sound
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +61,44 @@ public class NewAlarm extends Activity {
             Minutes = Integer.parseInt(getIntent().getStringExtra("Minute"));
             Date = getIntent().getStringExtra("Date");
             dc.setText(Date);
+        } else {
+
+            String curDayS;
+            String curMonthS;
+            Calendar c = Calendar.getInstance();
+
+            int Minute = c.get(Calendar.MINUTE);
+            int Hour = c.get(Calendar.HOUR_OF_DAY);
+
+            int curDay = c.get(Calendar.DAY_OF_MONTH);
+            int curMonth = c.get(Calendar.MONTH) + 1;
+            int curYear = c.get(Calendar.YEAR);
+
+            if (curDay < 10)
+                curDayS = "0" + curDay;
+            else
+                curDayS = "" + curDay;
+
+            if (curMonth < 10)
+                curMonthS = "0" + curMonth;
+            else
+                curMonthS = "" + curMonth;
+
+
+            String Hourstring = Integer.toString(Hour);
+            String Minutestring = Integer.toString(Minute);
+
+            if (Integer.toString(Hour).length() == 1) {
+                Hourstring = "0" + Integer.toString(Hour);
+            }
+
+            if (Integer.toString(Minute).length() == 1) {
+                Minutestring = "0" + Integer.toString(Minute);
+            }
+
+
+            Date = curDayS + "-" + curMonthS + "-" + curYear;
+            final String CurrentTime = Hourstring + ":" + Minutestring;
         }
     }
 
@@ -76,7 +112,7 @@ public class NewAlarm extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
-        if (requestCode == PICK_CONTACT_REQUEST) {
+        if (requestCode == 10) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 System.out.println(data.getData().toString());
@@ -94,7 +130,7 @@ public class NewAlarm extends Activity {
 
     //region TimeButtons
 
-    public void timeUpHourButton(View view) {
+    public void timeUpHourButton_click(View view) {
         if (Hours == 23) {
             Hours = 0;
         } else {
@@ -111,7 +147,7 @@ public class NewAlarm extends Activity {
 
     }
 
-    public void timeDownHourButton(View view) {
+    public void timeDownHourButton_click(View view) {
         if (Hours == 0) {
             Hours = 23;
         } else {
@@ -126,7 +162,7 @@ public class NewAlarm extends Activity {
         }
     }
 
-    public void timeUpMinuteButton(View view) {
+    public void timeUpMinuteButton_click(View view) {
         if (Minutes == 59) {
             Minutes = 0;
         } else {
@@ -141,7 +177,7 @@ public class NewAlarm extends Activity {
         }
     }
 
-    public void timeDownMinuteButton(View view) {
+    public void timeDownMinuteButton_click(View view) {
         if (Minutes == 0) {
             Minutes = 59;
         } else {
@@ -156,24 +192,38 @@ public class NewAlarm extends Activity {
         }
     }
 
+    public void timeHourButton_click(View view) {
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle("Alarm time");
+        dialog.setContentView(R.layout.dialog_timepicker);
+        //TODO: Add timepicker functionality.
+        setContentView(R.layout.alarm);
+    }
+
+    public void timeMinuteButton_click(View view) {
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle("Alarm time");
+        dialog.setContentView(R.layout.dialog_timepicker);
+
+    }
     //endregion
 
-    public void cancelNewAlarmButton(View view) {
+    public void cancelNewAlarmButton_click(View view) {
         finish();
         Intent intent = new Intent(this, MultiColumnActivity.class);
         startActivity(intent);
     }
 
-    public void saveNewAlarmButton(View view) throws JSONException {
+    public void saveNewAlarmButton_click(View view) throws JSONException {
         //TODO check if total time in millis is bigger than current time in millies, if not show toast about time in past not being possible.
         File Root = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/");
         File file = new File(Root, "Alarms.json");
         Button thb = (Button) findViewById(R.id.timeHourButton);
         Button tmb = (Button) findViewById(R.id.timeMinuteButton);
         EditText et = (EditText) findViewById(R.id.alarmName);
-        Button tb = (Button) findViewById(R.id.toneButton);
 
-        ArrayList<JSONObject> text = new ArrayList<>();
+        ArrayList<String> text = new ArrayList<>();
+        ArrayList<JSONObject> json = new ArrayList<>();
         ArrayList<Integer> Ids = new ArrayList<>();
         String JsonString = new String();
 
@@ -196,7 +246,8 @@ public class NewAlarm extends Activity {
             //Read the file line by line
             while ((line = br.readLine()) != null) {
                 JSONObject obj = new JSONObject(line);
-                text.add(obj);
+                json.add(obj);
+                text.add(line);
                 Ids.add(obj.getInt("Id"));
             }
             br.close();
@@ -219,6 +270,8 @@ public class NewAlarm extends Activity {
         Json.put("Hour", hourtext);
         Json.put("Minute", minutetext);
         Json.put("Name", alarmname);
+
+        //Add the date
         if (Date != null && !Date.equals("No dates selected"))
             Json.put("Date", Date);
         else {
@@ -267,16 +320,20 @@ public class NewAlarm extends Activity {
                 Json.put("Date", TomorrahDate);
             }
         }
+
         Json.put("Tone", FName);
+        if (FName == null) {
+            AlarmType = 0;
+        }
         Json.put("Volume", "EmptyVolume");
-        Json.put("Type", "EmptyType");
+        Json.put("Type", AlarmType);
         Json.put("Location", "EmptyLocation");
         //endregion
 
         //region WriteFile
         for (int i = 0; i < text.size(); i++) {
             //Combine old string with the listobject
-            if (getIntent().getIntExtra("Id", -1) == text.get(i).getInt("Id")) {
+            if (getIntent().getIntExtra("Id", -1) == json.get(i).getInt("Id")) {
             } else {
                 JsonString = JsonString + text.get(i) + "\n";
             }
@@ -302,33 +359,33 @@ public class NewAlarm extends Activity {
 
     }
 
-    public void dateButton(View view) {
+    public void dateButton_click(View view) {
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("Pick day(s) to repeat");
-        dialog.setContentView(R.layout.datepicker);
+        dialog.setContentView(R.layout.dialog_datepicker);
 
-        dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_box);
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog);
 
 
         Calendar c = Calendar.getInstance();
-        CalendarView cv = (CalendarView) dialog.findViewById(R.id.calendarView);
-        cv.setFirstDayOfWeek(Calendar.SUNDAY);
-        cv.setMinDate(c.getTimeInMillis() - 1200);
-
         CalendarView calendarView = (CalendarView) dialog.findViewById(R.id.calendarView);
+        calendarView.setFirstDayOfWeek(Calendar.SUNDAY);
+        calendarView.setMinDate(c.getTimeInMillis() - 1200);
+
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             ArrayList<String> dates = new ArrayList<>();
 
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                TextView tv = (TextView) dialog.findViewById(R.id.calDateText);
-                CalendarView CV = (CalendarView) dialog.findViewById(R.id.calendarView);
-                Date = new SimpleDateFormat("dd-MM-yyyy").format(new Date(CV.getDate()));
-//                CalMonth = new SimpleDateFormat("MM").format(new Date(CV.getDate()));
-//                CalYear = new SimpleDateFormat("yyyy").format(new Date(CV.getDate()));
-//                Date = CalDay + "-" + CalMonth + "-" + CalYear;
+
+                ArrayList<String> dates = new ArrayList<>();
                 int i = 0;
                 String text = "";
+                TextView tv = (TextView) dialog.findViewById(R.id.calDateText);
+                CalendarView CV = (CalendarView) dialog.findViewById(R.id.calendarView);
+
+                Date = new SimpleDateFormat("dd-MM-yyyy").format(new Date(CV.getDate()));
+
 
                 if (!dates.contains(Date + ", "))
                     dates.add(Date + ", ");
@@ -375,12 +432,12 @@ public class NewAlarm extends Activity {
         dialog.show();
     }
 
-    public void dailyButton(View view) {
+    public void dailyButton_click(View view) {
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("Pick day(s) to repeat");
-        dialog.setContentView(R.layout.repeatdays);
+        dialog.setContentView(R.layout.dialog_repeatdays);
 
-        dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_box);
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog);
 
         //region SaveButton
         Button saveButton = (Button) dialog.findViewById(R.id.saveButton);
@@ -432,16 +489,15 @@ public class NewAlarm extends Activity {
         dialog.show();
     }
 
-    public void cancelButton(View view) {
+    public void cancelButton_click(View view) {
         setContentView(R.layout.newalarm);
     }
 
-    public void AlarmTone(View view) {
+    public void alarmToneButton_click(View view) {
 //        Toast.makeText(this, "Working on it!", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, PICK_CONTACT_REQUEST);
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, 10);
     }
-
 
     public String getRealPathFromURI(Uri contentUri) {
         String res = "";
@@ -455,16 +511,45 @@ public class NewAlarm extends Activity {
         return res;
     }
 
-    public void AlarmType(View view) {
-        Toast.makeText(this, "Working on it!", Toast.LENGTH_SHORT).show();
+    public void alarmTypeButton_click(View view) {
         final Dialog dialog = new Dialog(this);
-        dialog.setTitle("This will be next :P");
-        dialog.setContentView(R.layout.typedialog);
+        dialog.setTitle("Select the alarm type");
+        dialog.setContentView(R.layout.dialog_typepicker);
 
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog);
+
+        Button vibrationButton = (Button) dialog.findViewById(R.id.vibrationTypeButton);
+        vibrationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlarmType = 0;
+                dialog.dismiss();
+            }
+        });
+
+        Button soundButton = (Button) dialog.findViewById(R.id.soundTypeButton);
+        soundButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlarmType = 1;
+                dialog.dismiss();
+            }
+        });
+
+        Button bothButton = (Button) dialog.findViewById(R.id.bothTypeButton);
+        bothButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlarmType = 2;
+                dialog.dismiss();
+            }
+        });
+
+        //endregion
         dialog.show();
     }
 
-    public void LocationClick(View view) {
+    public void locationButton_click(View view) {
         Toast.makeText(this, "Not Implemented yet", Toast.LENGTH_SHORT).show();
     }
 
