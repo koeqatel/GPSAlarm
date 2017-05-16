@@ -68,7 +68,6 @@ public class Main extends Activity {
 
         alert.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                Toast.makeText(Main.this, "Fix Edit", Toast.LENGTH_SHORT).show();
                 //Read file in while loop, make json object, Add object content with Id via Intent
                 File file = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/", "Alarms.json");
 
@@ -89,7 +88,7 @@ public class Main extends Activity {
                             String Date = obj.getString("Date");
                             String Tone = obj.getString("Tone");
                             String Volume = obj.getString("Volume");
-                            String Type = obj.getString("Type");
+                            Integer Type = obj.getInt("Type");
                             String Location = obj.getString("Location");
 
 

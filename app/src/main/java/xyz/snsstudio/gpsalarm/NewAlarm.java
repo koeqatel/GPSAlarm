@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.app.Activity;
 import android.widget.Toast;
@@ -49,18 +50,29 @@ public class NewAlarm extends Activity {
         loadAfterRedirect();
         if (getIntent().getIntExtra("Id", -1) != -1) {
             //Put everything to text, delete old view with this id
-            Button thb = (Button) findViewById(R.id.timeHourButton);
-            Button tmb = (Button) findViewById(R.id.timeMinuteButton);
-            EditText an = (EditText) findViewById(R.id.alarmName);
-            TextView dc = (TextView) findViewById(R.id.dateContent);
+            Button timeHourButton = (Button) findViewById(R.id.timeHourButton);
+            Button timeMinuteButton = (Button) findViewById(R.id.timeMinuteButton);
+            EditText alarmName = (EditText) findViewById(R.id.alarmName);
+            TextView dateContent = (TextView) findViewById(R.id.dateContent);
+            SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeBar);
+            Button toneButton = (Button) findViewById(R.id.toneButton);
 
-            thb.setText(getIntent().getStringExtra("Hour"));
-            tmb.setText(getIntent().getStringExtra("Minute"));
-            an.setText(getIntent().getStringExtra("Name"));
+            FName = getIntent().getStringExtra("Tone");
+            String[] UFFName = FName.split("/");
+
+            timeHourButton.setText(getIntent().getStringExtra("Hour"));
+            timeMinuteButton.setText(getIntent().getStringExtra("Minute"));
+            alarmName.setText(getIntent().getStringExtra("Name"));
+            volumeBar.setProgress(Integer.parseInt(getIntent().getStringExtra("Volume")));
+            toneButton.setText("Alarm tone: " + UFFName[UFFName.length - 1]);
+            dateContent.setText(Date);
+
             Hours = Integer.parseInt(getIntent().getStringExtra("Hour"));
             Minutes = Integer.parseInt(getIntent().getStringExtra("Minute"));
             Date = getIntent().getStringExtra("Date");
-            dc.setText(Date);
+            AlarmType = getIntent().getIntExtra("Type", 0);
+
+            //Only location is missing.
         } else {
 
             String curDayS;
@@ -325,7 +337,10 @@ public class NewAlarm extends Activity {
         if (FName == null) {
             AlarmType = 0;
         }
-        Json.put("Volume", "EmptyVolume");
+
+        SeekBar seek = (SeekBar) findViewById(R.id.volumeBar);
+
+        Json.put("Volume", seek.getProgress());
         Json.put("Type", AlarmType);
         Json.put("Location", "EmptyLocation");
         //endregion
@@ -378,7 +393,6 @@ public class NewAlarm extends Activity {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
 
-                ArrayList<String> dates = new ArrayList<>();
                 int i = 0;
                 String text = "";
                 TextView tv = (TextView) dialog.findViewById(R.id.calDateText);

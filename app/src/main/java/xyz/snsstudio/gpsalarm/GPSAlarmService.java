@@ -99,7 +99,7 @@ public class GPSAlarmService extends Service {
                                         if (Type == 0 || Type == 2) {
                                             showNotification(obj.getString("Name"));
                                         } else if (Type == 1 || Type == 2) {
-                                            showAlarm(obj.getString("Name"), obj.getString("Tone"));
+                                            showAlarm(obj.getString("Name"), obj.getString("Tone"), obj.getInt("Volume"));
                                             break;
                                         }
                                     }
@@ -140,11 +140,12 @@ public class GPSAlarmService extends Service {
         notificationManager.notify(0, notification);
     }
 
-    public void showAlarm(String Alarmname, String Tone) {
+    public void showAlarm(String Alarmname, String Tone, Integer Volume) {
         Intent dialogIntent = new Intent(this, Alarm.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra("Name", Alarmname);
         dialogIntent.putExtra("Tone", Tone);
+        dialogIntent.putExtra("Volume", Volume);
         startActivity(dialogIntent);
     }
 }

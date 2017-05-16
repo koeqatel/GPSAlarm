@@ -27,6 +27,7 @@ public class Alarm extends Activity {
 
         try {
             mediaPlayer.setDataSource(getIntent().getStringExtra("Tone"));
+            mediaPlayer.setVolume(0.2f, 0.2f);
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (IOException e) {
