@@ -2,6 +2,7 @@ package xyz.snsstudio.gpsalarm;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,10 +27,16 @@ public class Alarm extends Activity {
         setContentView(R.layout.alarm);
 
         try {
-            mediaPlayer.setDataSource(getIntent().getStringExtra("Tone"));
-            mediaPlayer.setVolume(0.2f, 0.2f);
+            float volume;
+            volume = getIntent().getIntExtra("Volume", 75) / 100.0f;
+
+            mediaPlayer.setDataSource(this, Uri.parse(getIntent().getStringExtra("Tone")));
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+            mediaPlayer.setLooping(true);
             mediaPlayer.prepare();
+            mediaPlayer.setVolume(volume, volume);
             mediaPlayer.start();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

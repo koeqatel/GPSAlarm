@@ -40,7 +40,7 @@ public class NewAlarm extends Activity {
     String FName = "";
     String DaysOfWeek = "";
     String Date;
-    int AlarmType = 0; //0 = notification, 1 = sound, 2 = vibrate and sound
+    int AlarmType = 1; //0 = vibrate, 1 = sound, 2 = vibrate and sound, 3 = Notification
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,7 +209,6 @@ public class NewAlarm extends Activity {
         dialog.setTitle("Alarm time");
         dialog.setContentView(R.layout.dialog_timepicker);
         //TODO: Add timepicker functionality.
-        setContentView(R.layout.alarm);
     }
 
     public void timeMinuteButton_click(View view) {
@@ -530,13 +529,16 @@ public class NewAlarm extends Activity {
         dialog.setTitle("Select the alarm type");
         dialog.setContentView(R.layout.dialog_typepicker);
 
+        final Button typeButton = (Button) this.findViewById(R.id.typeButton);
+        Button vibrationButton = (Button) dialog.findViewById(R.id.vibrationTypeButton);
+
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog);
 
-        Button vibrationButton = (Button) dialog.findViewById(R.id.vibrationTypeButton);
         vibrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlarmType = 0;
+                typeButton.setText("Vibration alarm");
                 dialog.dismiss();
             }
         });
@@ -546,12 +548,23 @@ public class NewAlarm extends Activity {
             @Override
             public void onClick(View v) {
                 AlarmType = 1;
+                typeButton.setText("Sound alarm");
                 dialog.dismiss();
             }
         });
 
         Button bothButton = (Button) dialog.findViewById(R.id.bothTypeButton);
         bothButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlarmType = 2;
+                typeButton.setText("Sound and vibration alarm");
+                dialog.dismiss();
+            }
+        });
+
+        Button notificationButton = (Button) dialog.findViewById(R.id.notificationTypeButton);
+        notificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlarmType = 2;

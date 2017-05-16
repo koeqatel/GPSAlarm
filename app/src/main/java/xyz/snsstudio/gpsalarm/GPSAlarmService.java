@@ -97,10 +97,11 @@ public class GPSAlarmService extends Service {
                                 if (CurrentDate.equals(Date.get(i)) || curWeekDayName.equals(Date.get(i))) {
                                     if (CurrentTime.equals(AlarmTime)) {
                                         if (Type == 0 || Type == 2) {
-                                            showNotification(obj.getString("Name"));
+                                            vibrate();
                                         } else if (Type == 1 || Type == 2) {
                                             showAlarm(obj.getString("Name"), obj.getString("Tone"), obj.getInt("Volume"));
-                                            break;
+                                        } else if (Type == 3 || Type == 2) {
+                                            showNotification(obj.getString("Name"));
                                         }
                                     }
                                     i++;
@@ -123,6 +124,10 @@ public class GPSAlarmService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void vibrate() {
+
     }
 
     public void showNotification(String Alarmname) {

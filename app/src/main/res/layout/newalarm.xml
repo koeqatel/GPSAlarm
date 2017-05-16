@@ -165,20 +165,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Alarm type"
-            android:textAlignment="center"
-            android:textColor="#ffffff" />
-
-        <TextView
-            android:id="@+id/typeContent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:textColor="#ffffff" />
-
         <Button
             android:id="@+id/typeButton"
             android:layout_width="match_parent"

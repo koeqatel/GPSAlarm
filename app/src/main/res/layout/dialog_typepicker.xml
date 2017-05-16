@@ -35,4 +35,14 @@
         android:layout_marginTop="5dp"
         android:onClick="bothTypeButton"
         android:text="Sound and Vibration alarm" />
+
+    <Button
+        android:id="@+id/notificationTypeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:onClick="notificationTypeButton"
+        android:text="Notification" />
 </LinearLayout>
