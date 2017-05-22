@@ -38,8 +38,8 @@ public class Main extends Activity {
         PowerManager powerManager = (PowerManager) this.getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "GPSAlarmService");
         wakeLock.acquire();
-        //TODO This feels dirty
-        //Thats because it is...
+        //TODO: I barely remember what a wakelock does but I do remember it being dirty.
+        //Find a better way to do whatever I was doing by this.
 
         startService(new Intent(this, GPSAlarmService.class));
 
@@ -64,7 +64,7 @@ public class Main extends Activity {
 
     public void editModal(final int Id) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("What would you like to do with ID " + Id + "?");
+        alert.setTitle("What would you like to do?");
 
         alert.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -81,7 +81,7 @@ public class Main extends Activity {
                         JSONObject obj = new JSONObject(line);
                         int id = obj.getInt("Id");
                         if (id == Id) {
-                            //Here i get the items from the Json and push them to NewAlarm
+                            //Here I get the items from the Json and push them to NewAlarm
                             String Hour = obj.getString("Hour");
                             String Minute = obj.getString("Minute");
                             String Name = obj.getString("Name");
@@ -89,7 +89,8 @@ public class Main extends Activity {
                             String Tone = obj.getString("Tone");
                             String Volume = obj.getString("Volume");
                             Integer Type = obj.getInt("Type");
-                            String Location = obj.getString("Location");
+                            double Latitude = obj.getDouble("Latitude");
+                            double Longitude = obj.getDouble("Longitude");
 
 
                             intent.putExtra("Id", Id);
@@ -100,7 +101,8 @@ public class Main extends Activity {
                             intent.putExtra("Tone", Tone);
                             intent.putExtra("Volume", Volume);
                             intent.putExtra("Type", Type);
-                            intent.putExtra("Location", Location);
+                            intent.putExtra("Latitude", Latitude);
+                            intent.putExtra("Longitude", Longitude);
                         }
                     }
                     br.close();
@@ -149,10 +151,11 @@ public class Main extends Activity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                //TODO find a legit way instead of this evil workaround
+                //TODO: The app now refreshes the whole page instead of only the listview.
+                //This is kind of dirty so find a better way to do this
 
-                finish();
                 Intent intent = new Intent(Main.this, Main.class);
+                finish();
                 startActivity(intent);
             }
         });

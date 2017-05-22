@@ -1,27 +1,14 @@
 package xyz.snsstudio.gpsalarm;
 
-import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
+import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
-import android.os.Looper;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.google.android.gms.maps.GoogleMap;
 
 import org.json.JSONObject;
 
@@ -42,6 +29,24 @@ public class GPSAlarmService extends Service {
     public String pubHour = "";
     public String pubMinute = "";
     public String AlarmDate = "";
+    public String curDayS;
+    public String curMonthS;
+    public int Type;
+
+    public class TimerDemo {
+        public void main(String[] args) {
+            // creating timer task, timer
+            TimerTask tasknew;
+            Timer timer = new Timer();
+
+            // scheduling the task at interval
+            timer.schedule(tasknew,100, 100);
+        }
+        // this method performs the task
+        public void run() {
+            System.out.println("timer working");
+        }
+    }
 
     public GPSAlarmService() {
 
@@ -51,7 +56,6 @@ public class GPSAlarmService extends Service {
                 Calendar c = Calendar.getInstance();
                 int Second = c.get(Calendar.SECOND);
                 if (Second == 0) {
-                    int Type;
                     int Minute = c.get(Calendar.MINUTE);
                     int Hour = c.get(Calendar.HOUR_OF_DAY);
                     int curDay = c.get(Calendar.DAY_OF_MONTH);
@@ -59,8 +63,6 @@ public class GPSAlarmService extends Service {
                     int curYear = c.get(Calendar.YEAR);
                     int curWeekDay = c.get(Calendar.DAY_OF_WEEK);
                     String curWeekDayName = new DateFormatSymbols().getWeekdays()[curWeekDay];
-                    String curDayS;
-                    String curMonthS;
 
 
                     if (curDay < 10)
@@ -106,20 +108,16 @@ public class GPSAlarmService extends Service {
 
                             List<String> Date = new ArrayList<String>(Arrays.asList(AlarmDate.split(", ")));
                             int i = 0;
+                            //TODO ask for type, if type is notification run "showNotification" else run "showAlarm"
                             while (i < Date.size()) {
                                 if (CurrentDate.equals(Date.get(i)) || curWeekDayName.equals(Date.get(i))) {
                                     if (CurrentTime.equals(AlarmTime)) {
-                                        boolean isAtLocation = getLocation(obj.getDouble("Latitude"), obj.getDouble("Longitude"));
-                                        if (isAtLocation) {
-                                            if (Type == 0 || Type == 2) {
-                                                vibrate();
-                                            }
-                                            if (Type == 1 || Type == 2) {
-                                                showAlarm(obj.getString("Name"), obj.getString("Tone"), obj.getInt("Volume"));
-                                            }
-                                            if (Type == 3) {
-                                                showNotification(obj.getString("Name"));
-                                            }
+                                        if (Type == 0 || Type == 2) {
+                                            vibrate();
+                                        } else if (Type == 1 || Type == 2) {
+                                            showAlarm(obj.getString("Name"), obj.getString("Tone"), obj.getInt("Volume"),  obj.getInt("Id"));
+                                        } else if (Type == 3 || Type == 2) {
+                                            showNotification(obj.getString("Name"));
                                         }
                                     }
                                     i++;
@@ -132,16 +130,69 @@ public class GPSAlarmService extends Service {
                     }
                     //endregion
                 }
-
             }
         };
 
-        SecTimer.schedule(seclyTask, 0l, 1000 * 1);
+        SecTimer.schedule(seclyTask, 0l, 1000);
     }
+
+    IBinder mBinder = new LocalBinder();
 
     @Override
     public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return mBinder;
+    }
+
+    public class LocalBinder extends Binder {
+        public GPSAlarmService getServerInstance() {
+            return GPSAlarmService.this;
+        }
+    }
+
+    public void snooze(final int Delay, final int id) {
+
+        Timer SecTimer = new Timer();
+        TimerTask seclyTask = new TimerTask() {
+            int snoozeDelay = Delay;
+
+            public void run() {
+                if (snoozeDelay != 0) {
+                    snoozeDelay = snoozeDelay - 1;
+                }
+                if (snoozeDelay == 0) {
+                    try {
+                        File file = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/", "Alarms.json");
+
+                        BufferedReader br = new BufferedReader(new FileReader(file));
+                        String line;
+                        //Read file line by line
+                        while ((line = br.readLine()) != null) {
+                            JSONObject obj = new JSONObject(line);
+                            if (obj.getInt("id") == id) {
+                                Type = parseInt(obj.getString("Type"));
+
+                                //TODO ask for type, if type is notification run "showNotification" else run "showAlarm"
+                                if (Type == 0 || Type == 2) {
+                                    vibrate();
+                                } else if (Type == 1 || Type == 2) {
+                                    showAlarm(obj.getString("Name"), obj.getString("Tone"), obj.getInt("Volume"),  obj.getInt("Id"));
+                                } else if (Type == 3 || Type == 2) {
+                                    showNotification(obj.getString("Name"));
+                                }
+                            }
+                        }
+                        br.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    snoozeDelay = -1;
+                }
+
+            }
+        };
+        SecTimer.schedule(seclyTask,0l,1000);
+
     }
 
     public void vibrate() {
@@ -163,70 +214,13 @@ public class GPSAlarmService extends Service {
         notificationManager.notify(0, notification);
     }
 
-    public void showAlarm(String Alarmname, String Tone, Integer Volume) {
+    public void showAlarm(String Alarmname, String Tone, Integer Volume, Integer id) {
         Intent dialogIntent = new Intent(this, Alarm.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra("Name", Alarmname);
+        dialogIntent.putExtra("Id", id);
         dialogIntent.putExtra("Tone", Tone);
         dialogIntent.putExtra("Volume", Volume);
         startActivity(dialogIntent);
-    }
-
-    public boolean getLocation(double lat1, double lng1) {
-        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        List<String> providers = manager.getAllProviders();
-        Location location;
-
-
-        double lat2 = 0;
-        double lng2 = 0;
-        for (int i = 0; i < providers.size(); i++) {
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return false;
-            }
-            location = manager.getLastKnownLocation(providers.get(i));
-            location.getTime();
-
-            lat2 = location.getLatitude();
-            lng2 = location.getLongitude();
-        }
-
-        // lat1 and lng1 are the values of a previously stored location
-        if (distance(lat1, lng1, lat2, lng2) < 0.1) { // if distance < 0.1 miles we take locations as equal
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * calculates the distance between two locations in MILES
-     */
-    private double distance(double lat1, double lng1, double lat2, double lng2) {
-
-        double earthRadius = 6371; // in miles, change to 6371 for kilometer output
-
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLng = Math.toRadians(lng2 - lng1);
-
-        double sindLat = Math.sin(dLat / 2);
-        double sindLng = Math.sin(dLng / 2);
-
-        double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
-                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        double dist = earthRadius * c;
-
-        return dist; // output distance, in KILOMETERS
     }
 }

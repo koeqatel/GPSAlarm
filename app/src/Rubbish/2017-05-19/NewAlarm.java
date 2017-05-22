@@ -43,9 +43,6 @@ public class NewAlarm extends Activity {
     String Date;
     int AlarmType = 1; //0 = vibrate, 1 = sound, 2 = vibrate and sound, 3 = Notification
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +64,7 @@ public class NewAlarm extends Activity {
             timeHourButton.setText(getIntent().getStringExtra("Hour"));
             timeMinuteButton.setText(getIntent().getStringExtra("Minute"));
             alarmName.setText(getIntent().getStringExtra("Name"));
-            volumeBar.setProgress(getIntent().getIntExtra("Volume", 75));
+            volumeBar.setProgress(Integer.parseInt(getIntent().getStringExtra("Volume")));
             toneButton.setText("Alarm tone: " + UFFName[UFFName.length - 1]);
             dateContent.setText(Date);
 
@@ -231,10 +228,8 @@ public class NewAlarm extends Activity {
 
     public void saveNewAlarmButton_click(View view) throws JSONException {
         //TODO check if total time in millis is bigger than current time in millies, if not show toast about time in past not being possible.
-
         File Root = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/");
         File file = new File(Root, "Alarms.json");
-
         Button thb = (Button) findViewById(R.id.timeHourButton);
         Button tmb = (Button) findViewById(R.id.timeMinuteButton);
         EditText et = (EditText) findViewById(R.id.alarmName);
@@ -243,6 +238,7 @@ public class NewAlarm extends Activity {
         ArrayList<JSONObject> json = new ArrayList<>();
         ArrayList<Integer> Ids = new ArrayList<>();
         String JsonString = new String();
+
         //region Create directory
         try {
             if (Root.mkdir()) {
@@ -346,8 +342,7 @@ public class NewAlarm extends Activity {
 
         Json.put("Volume", seek.getProgress());
         Json.put("Type", AlarmType);
-        Json.put("Latitude", getIntent().getDoubleExtra("Latitude", 0));
-        Json.put("Longitude", getIntent().getDoubleExtra("Longitude", 0));
+        Json.put("Location", getIntent().getStringExtra("LongAndLat"));
         //endregion
 
         //region WriteFile
@@ -459,8 +454,8 @@ public class NewAlarm extends Activity {
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog);
 
         //region SaveButton
-        Button saveDayButton = (Button) dialog.findViewById(R.id.saveDayButton);
-        saveDayButton.setOnClickListener(new View.OnClickListener() {
+        Button saveButton = (Button) dialog.findViewById(R.id.saveButton);
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 CheckBox checkBoxSunday = (CheckBox) dialog.findViewById(R.id.checkBoxSunday);
@@ -486,6 +481,7 @@ public class NewAlarm extends Activity {
                     DaysOfWeek += "Friday, ";
                 if (checkBoxSaturday.isChecked())
                     DaysOfWeek += "Saturday, ";
+                setContentView(R.layout.newalarm);
                 if (!DaysOfWeek.equals(""))
                     Date = DaysOfWeek.substring(0, DaysOfWeek.length() - 2);
                 TextView dc = (TextView) findViewById(R.id.dateContent);
@@ -496,8 +492,8 @@ public class NewAlarm extends Activity {
         //endregion
 
         //region CancelButton
-        Button cancelDayButton = (Button) dialog.findViewById(R.id.cancelDayButton);
-        cancelDayButton.setOnClickListener(new View.OnClickListener() {
+        Button cancelButton = (Button) dialog.findViewById(R.id.cancelButton);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
@@ -572,7 +568,7 @@ public class NewAlarm extends Activity {
         notificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlarmType = 3;
+                AlarmType = 2;
                 dialog.dismiss();
             }
         });
@@ -582,103 +578,7 @@ public class NewAlarm extends Activity {
     }
 
     public void locationButton_click(View view) {
-        Button thb = (Button) findViewById(R.id.timeHourButton);
-        Button tmb = (Button) findViewById(R.id.timeMinuteButton);
-        EditText et = (EditText) findViewById(R.id.alarmName);
-
-        ArrayList<Integer> Ids = new ArrayList<>();
-
         Intent intent = new Intent(this, MapsActivity.class);
-        int id = -1;
-        String hourtext = thb.getText().toString();
-        String minutetext = tmb.getText().toString();
-        String alarmname = et.getText().toString();
-
-
-        int max = -1;
-        if (Ids.size() != 0)
-            max = Collections.max(Ids);
-        if (getIntent().getIntExtra("Id", -1) == -1) {
-            max = max + 1;
-            id = max;
-        } else
-            id = getIntent().getIntExtra("Id", -1);
-
-        String hour = hourtext;
-        String minute = minutetext;
-        String name = alarmname;
-        String date;
-
-        if (Date != null && !Date.equals("No dates selected"))
-            date = Date;
-        else {
-            Calendar c = Calendar.getInstance();
-            int CurHour = c.get(Calendar.HOUR_OF_DAY);
-            int CurMinute = c.get(Calendar.MINUTE);
-
-            int AlarmHour = Integer.parseInt(hourtext);
-            int AlarmMinute = Integer.parseInt(minutetext);
-
-
-            int curDay = c.get(Calendar.DAY_OF_MONTH);
-            int curMonth = c.get(Calendar.MONTH) + 1;
-            int curYear = c.get(Calendar.YEAR);
-            int CurTimeInmins = CurHour * 60 + CurMinute;
-            int AlarmTimeInMins = AlarmHour * 60 + AlarmMinute;
-
-            if (CurTimeInmins < AlarmTimeInMins) {
-                String CurrentDate;
-
-                if (curDay < 10)
-                    CurrentDate = "0" + curDay + "-" + curMonth + "-" + curYear;
-                else if (curDay < 10 && curMonth < 10)
-                    CurrentDate = "0" + curDay + "-0" + curMonth + "-" + curYear;
-                else if (curMonth < 10)
-                    CurrentDate = curDay + "-0" + curMonth + "-" + curYear;
-                else
-                    CurrentDate = curDay + "-" + curMonth + "-" + curYear;
-                date = CurrentDate;
-            } else {
-                String TomorrahDate;
-                if (curDay < 10) {
-                    curDay++;
-                    TomorrahDate = "0" + curDay + "-" + curMonth + "-" + curYear;
-                } else if (curDay < 10 && curMonth < 10) {
-                    curDay++;
-                    TomorrahDate = "0" + curDay + "-0" + curMonth + "-" + curYear;
-                } else if (curMonth < 10) {
-                    curDay++;
-                    TomorrahDate = curDay + "-0" + curMonth + "-" + curYear;
-                } else {
-                    curDay++;
-                    TomorrahDate = curDay + "-" + curMonth + "-" + curYear;
-                }
-
-                date = TomorrahDate;
-            }
-        }
-
-
-        String tone = FName;
-        if (FName == null) {
-            AlarmType = 0;
-        }
-        SeekBar seek = (SeekBar) findViewById(R.id.volumeBar);
-        int volume = seek.getProgress();
-
-        int type = AlarmType;
-        String location = getIntent().getStringExtra("LongAndLat");
-
-
-        intent.putExtra("Id", id);
-        intent.putExtra("Hour", hour);
-        intent.putExtra("Minute", minute);
-        intent.putExtra("Name", name);
-        intent.putExtra("Date", date);
-        intent.putExtra("Tone", tone);
-        intent.putExtra("Volume", volume);
-        intent.putExtra("Type", type);
-        intent.putExtra("Location", location);
         startActivity(intent);
     }
 
