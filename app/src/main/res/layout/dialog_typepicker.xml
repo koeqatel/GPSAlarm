@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
-        android:onClick="vibrationTypeButton"
+        android:onClick="vibrationTypeButton_click"
         android:text="Vibration alarm" />
 
     <Button
@@ -23,7 +23,7 @@
         android:layout_gravity="center"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
-        android:onClick="soundTypeButton"
+        android:onClick="soundTypeButton_click"
         android:text="Sound alarm" />
 
     <Button
@@ -33,7 +33,7 @@
         android:layout_gravity="center"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
-        android:onClick="bothTypeButton"
+        android:onClick="bothTypeButton_click"
         android:text="Sound and Vibration alarm" />
 
     <Button
@@ -43,6 +43,6 @@
         android:layout_gravity="center"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
-        android:onClick="notificationTypeButton"
+        android:onClick="notificationTypeButton_click"
         android:text="Notification" />
 </LinearLayout>

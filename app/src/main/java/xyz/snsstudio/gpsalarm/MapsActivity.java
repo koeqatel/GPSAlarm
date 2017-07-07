@@ -1,6 +1,7 @@
 package xyz.snsstudio.gpsalarm;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,6 +11,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -35,8 +38,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Location mLastLocation;
     LocationRequest mLocationRequest;
     Marker marker;
-    double Longitude;
-    double Latitude;
+    double Longitude = 200;
+    double Latitude = 100;
+
+    EditText radiusText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if (Data.Latitude != 100 && Data.Longitude != 200) {
+            try {
+                marker = mMap.addMarker(new MarkerOptions()
+                        .position(
+                                new LatLng(Data.Latitude,
+                                        Data.Longitude))
+                        .draggable(true).visible(true));
+            } catch (NullPointerException e) {
+                //Do nothing.
+            }
+        }
 
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -122,8 +139,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mLastLocation = location;
 
-        Latitude = location.getLatitude();
-        Longitude = location.getLongitude();
+//        double CurLatitude = location.getLatitude();
+//        double CurLongitude = location.getLongitude();
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -139,7 +156,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -200,7 +216,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // Permission denied, Disable the functionality that depends on this permission.
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                 }
-                return;
             }
 
             // other 'case' lines to check for other permissions this app might request.
@@ -216,29 +231,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void mapSaveButton_click(View view) {
 
-        Intent intent = new Intent(this, NewAlarm.class);
-        int Id = getIntent().getIntExtra("Id", -1);
-        String Hour = getIntent().getStringExtra("Hour");
-        String Minute = getIntent().getStringExtra("Minute");
-        String Name = getIntent().getStringExtra("Name");
-        String Date = getIntent().getStringExtra("Date");
-        String Tone = getIntent().getStringExtra("Tone");
-        int Volume = getIntent().getIntExtra("Volume", 75);
-        int Type = getIntent().getIntExtra("Type", 0);
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle("Options");
+        dialog.setContentView(R.layout.dialog_savelocation);
 
 
-        intent.putExtra("Id", Id);
-        intent.putExtra("Hour", Hour);
-        intent.putExtra("Minute", Minute);
-        intent.putExtra("Name", Name);
-        intent.putExtra("Date", Date);
-        intent.putExtra("Tone", Tone);
-        intent.putExtra("Volume", Volume);
-        intent.putExtra("Type", Type);
-        intent.putExtra("Latitude", Latitude);
-        intent.putExtra("Longitude", Longitude);
+        radiusText = (EditText) dialog.findViewById(R.id.radiusText);
+        if (Data.LocationRadius != 0) {
+            radiusText.setText(Data.LocationRadius + "");
+        } else {
+            radiusText.setText("10");
+        }
 
-        finish();
-        startActivity(intent);
+
+        final Button saveLocButton = (Button) dialog.findViewById(R.id.LocationSaveButton);
+        saveLocButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (radiusText.getText().toString() == "")
+                    Data.LocationRadius = 10;
+                else
+                    Data.LocationRadius = Integer.parseInt(radiusText.getText().toString());
+
+                if (marker == null) {
+                    Data.Latitude = 100d;
+                    Data.Longitude = 200d;
+                } else {
+                    LatLng latlong = marker.getPosition();
+                    Data.Latitude = latlong.latitude;
+                    Data.Longitude = latlong.longitude;
+                }
+
+                Intent intent = new Intent(v.getContext(), NewAlarm.class);
+                intent.putExtra("Repopulate", true);
+                finish();
+                startActivity(intent);
+
+                dialog.dismiss();
+            }
+        });
+
+        final Button cancelLocButton = (Button) dialog.findViewById(R.id.LocationCancelButton);
+        cancelLocButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        //endregion
+        dialog.show();
     }
 }

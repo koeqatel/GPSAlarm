@@ -3,7 +3,6 @@ package xyz.snsstudio.gpsalarm;
 import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,89 +31,70 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Locale;
 
 public class NewAlarm extends Activity {
-    public int Hours = 6;
-    public int Minutes = 0;
-    public JSONObject Json = new JSONObject();
-    public ArrayList<String> TempSaveList = new ArrayList<>();
-    String FName = "";
-    String DaysOfWeek = "";
-    String Date;
-    int AlarmType = 1; //0 = vibrate, 1 = sound, 2 = vibrate and sound, 3 = Notification
+    String ToneFullName; //FName
+    String[] ToneFileNameParts; //UFFName
+    int Hours = 6;
+    int Minutes = 0;
+    String showdate;
+    boolean cancelSave = false;
+    ArrayList<Date> dates = new ArrayList<>();
+    ArrayList<String> DaysOfWeek = new ArrayList<>();
 
+    EditText alarmName;
+    Button timeHourButton;
+    Button timeMinuteButton;
+    Button typeButton;
+    Button dailyButton;
+    Button dateButton;
+    TextView dateText;
+    Button toneButton;
+    SeekBar volumeBar;
+    Button locationButton;
 
-
+    int save_Id;
+    String save_Name;
+    ArrayList<Date> save_DateTime;
+    int save_Type;
+    ArrayList<String> save_Daily;
+    String save_Tone;
+    int save_Volume;
+    double save_Latitude;
+    double save_Longitude;
+    int save_LocationRadius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.newalarm);
 
-        loadAfterRedirect();
-        if (getIntent().getIntExtra("Id", -1) != -1) {
-            //Put everything to text, delete old view with this id
-            Button timeHourButton = (Button) findViewById(R.id.timeHourButton);
-            Button timeMinuteButton = (Button) findViewById(R.id.timeMinuteButton);
-            EditText alarmName = (EditText) findViewById(R.id.alarmName);
-            TextView dateContent = (TextView) findViewById(R.id.dateContent);
-            SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeBar);
-            Button toneButton = (Button) findViewById(R.id.toneButton);
+        alarmName = (EditText) findViewById(R.id.alarmName);
+        timeHourButton = (Button) findViewById(R.id.timeHourButton);
+        timeMinuteButton = (Button) findViewById(R.id.timeMinuteButton);
+        typeButton = (Button) findViewById(R.id.alarmTypeButton);
+        alarmName = (EditText) findViewById(R.id.alarmName);
+        dailyButton = (Button) findViewById(R.id.dailyButton);
+        dateButton = (Button) findViewById(R.id.dateButton);
+        dateText = (TextView) findViewById(R.id.dateContent);
+        toneButton = (Button) findViewById(R.id.alarmToneButton);
+        volumeBar = (SeekBar) findViewById(R.id.volumeBar);
+        locationButton = (Button) findViewById(R.id.locationButton);
 
-            FName = getIntent().getStringExtra("Tone");
-            String[] UFFName = FName.split("/");
+        if (getIntent().getBooleanExtra("Repopulate", false)) {
+            save_Id = Data.Id;
+            save_Name = Data.Name;
+            save_Type = Data.Type;
+            save_DateTime = Data.DateTime;
+            save_Daily = Data.Daily;
+            save_Tone = Data.Tone;
+            save_Volume = Data.Volume;
+            save_Latitude = Data.Latitude;
+            save_Longitude = Data.Longitude;
+            save_LocationRadius = Data.LocationRadius;
 
-            timeHourButton.setText(getIntent().getStringExtra("Hour"));
-            timeMinuteButton.setText(getIntent().getStringExtra("Minute"));
-            alarmName.setText(getIntent().getStringExtra("Name"));
-            volumeBar.setProgress(getIntent().getIntExtra("Volume", 75));
-            toneButton.setText("Alarm tone: " + UFFName[UFFName.length - 1]);
-            dateContent.setText(Date);
-
-            Hours = Integer.parseInt(getIntent().getStringExtra("Hour"));
-            Minutes = Integer.parseInt(getIntent().getStringExtra("Minute"));
-            Date = getIntent().getStringExtra("Date");
-            AlarmType = getIntent().getIntExtra("Type", 0);
-
-            //Only location is missing.
-        } else {
-
-            String curDayS;
-            String curMonthS;
-            Calendar c = Calendar.getInstance();
-
-            int Minute = c.get(Calendar.MINUTE);
-            int Hour = c.get(Calendar.HOUR_OF_DAY);
-
-            int curDay = c.get(Calendar.DAY_OF_MONTH);
-            int curMonth = c.get(Calendar.MONTH) + 1;
-            int curYear = c.get(Calendar.YEAR);
-
-            if (curDay < 10)
-                curDayS = "0" + curDay;
-            else
-                curDayS = "" + curDay;
-
-            if (curMonth < 10)
-                curMonthS = "0" + curMonth;
-            else
-                curMonthS = "" + curMonth;
-
-
-            String Hourstring = Integer.toString(Hour);
-            String Minutestring = Integer.toString(Minute);
-
-            if (Integer.toString(Hour).length() == 1) {
-                Hourstring = "0" + Integer.toString(Hour);
-            }
-
-            if (Integer.toString(Minute).length() == 1) {
-                Minutestring = "0" + Integer.toString(Minute);
-            }
-
-
-            Date = curDayS + "-" + curMonthS + "-" + curYear;
-            final String CurrentTime = Hourstring + ":" + Minutestring;
+            populateView(Data.Name, Data.DateTime, Data.Daily, Data.Tone, Data.Volume, Data.Type);
         }
     }
 
@@ -131,14 +111,12 @@ public class NewAlarm extends Activity {
         if (requestCode == 10) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                System.out.println(data.getData().toString());
-                Button tb = (Button) findViewById(R.id.toneButton);
                 try {
-                    FName = getRealPathFromURI(data.getData());
-                    String[] UFFName = FName.split("/");
-                    tb.setText("Alarm tone: " + UFFName[UFFName.length - 1]);
+                    ToneFullName = getRealPathFromURI(data.getData());
+                    ToneFileNameParts = ToneFullName.split("/");
+                    toneButton.setText("Alarm tone: " + ToneFileNameParts[ToneFileNameParts.length - 1]);
                 } catch (Exception Ex) {
-                    Toast.makeText(this, "Error: " + Ex + "\n" + FName, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Error: " + Ex, Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -213,170 +191,41 @@ public class NewAlarm extends Activity {
         dialog.setTitle("Alarm time");
         dialog.setContentView(R.layout.dialog_timepicker);
         //TODO: Add timepicker functionality.
+
     }
 
     public void timeMinuteButton_click(View view) {
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("Alarm time");
         dialog.setContentView(R.layout.dialog_timepicker);
+        //TODO: Add timepicker functionality.
 
     }
     //endregion
 
-    public void cancelNewAlarmButton_click(View view) {
+    public void newAlarmCancelButton_click(View view) {
         finish();
         Intent intent = new Intent(this, Main.class);
         startActivity(intent);
     }
 
-    public void saveNewAlarmButton_click(View view) throws JSONException {
-        //TODO check if total time in millis is bigger than current time in millies, if not show toast about time in past not being possible.
-
+    public void newAlarmSaveButton_click(View view) throws JSONException {
         File Root = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/");
-        File file = new File(Root, "Alarms.json");
 
-        Button thb = (Button) findViewById(R.id.timeHourButton);
-        Button tmb = (Button) findViewById(R.id.timeMinuteButton);
-        EditText et = (EditText) findViewById(R.id.alarmName);
-
-        ArrayList<String> text = new ArrayList<>();
-        ArrayList<JSONObject> json = new ArrayList<>();
-        ArrayList<Integer> Ids = new ArrayList<>();
-        String JsonString = new String();
-        //region Create directory
-        try {
-            if (Root.mkdir()) {
-                System.out.println("Directory created");
-            } else {
-                System.out.println("Directory is not created, like whatever...");
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        //endregion
-
-        //region ReadFile
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            //Read the file line by line
-            while ((line = br.readLine()) != null) {
-                JSONObject obj = new JSONObject(line);
-                json.add(obj);
-                text.add(line);
-                Ids.add(obj.getInt("Id"));
-            }
-            br.close();
-        } catch (Exception Ex) {
-            System.out.println(Ex);
-        }
-        //endregion
-
-        //region Create Json object
-        String hourtext = thb.getText().toString();
-        String minutetext = tmb.getText().toString();
-        String alarmname = et.getText().toString();
-        int max = -1;
-        if (Ids.size() != 0)
-            max = Collections.max(Ids);
-        if (getIntent().getIntExtra("Id", -1) == -1)
-            Json.put("Id", max + 1);
-        else
-            Json.put("Id", getIntent().getIntExtra("Id", -1));
-        Json.put("Hour", hourtext);
-        Json.put("Minute", minutetext);
-        Json.put("Name", alarmname);
-
-        //Add the date
-        if (Date != null && !Date.equals("No dates selected"))
-            Json.put("Date", Date);
-        else {
-            Calendar c = Calendar.getInstance();
-            int CurHour = c.get(Calendar.HOUR_OF_DAY);
-            int CurMinute = c.get(Calendar.MINUTE);
-
-            int AlarmHour = Integer.parseInt(hourtext);
-            int AlarmMinute = Integer.parseInt(minutetext);
-
-
-            int curDay = c.get(Calendar.DAY_OF_MONTH);
-            int curMonth = c.get(Calendar.MONTH) + 1;
-            int curYear = c.get(Calendar.YEAR);
-            int CurTimeInmins = CurHour * 60 + CurMinute;
-            int AlarmTimeInMins = AlarmHour * 60 + AlarmMinute;
-
-            if (CurTimeInmins < AlarmTimeInMins) {
-                String CurrentDate;
-
-                if (curDay < 10)
-                    CurrentDate = "0" + curDay + "-" + curMonth + "-" + curYear;
-                else if (curDay < 10 && curMonth < 10)
-                    CurrentDate = "0" + curDay + "-0" + curMonth + "-" + curYear;
-                else if (curMonth < 10)
-                    CurrentDate = curDay + "-0" + curMonth + "-" + curYear;
-                else
-                    CurrentDate = curDay + "-" + curMonth + "-" + curYear;
-                Json.put("Date", CurrentDate);
-            } else {
-                String TomorrahDate;
-                if (curDay < 10) {
-                    curDay++;
-                    TomorrahDate = "0" + curDay + "-" + curMonth + "-" + curYear;
-                } else if (curDay < 10 && curMonth < 10) {
-                    curDay++;
-                    TomorrahDate = "0" + curDay + "-0" + curMonth + "-" + curYear;
-                } else if (curMonth < 10) {
-                    curDay++;
-                    TomorrahDate = curDay + "-0" + curMonth + "-" + curYear;
-                } else {
-                    curDay++;
-                    TomorrahDate = curDay + "-" + curMonth + "-" + curYear;
-                }
-
-                Json.put("Date", TomorrahDate);
-            }
+        //Create directory
+        if (Root.mkdir()) {
+            System.out.println("Directory created");
+        } else {
+            System.out.println("For some reason the directory could not be created.");
         }
 
-        Json.put("Tone", FName);
-        if (FName == null) {
-            AlarmType = 0;
+        prepareData(true);
+        if (!cancelSave) {
+            Data.clean();
+            Intent intent = new Intent(this, Main.class);
+            finish();
+            startActivity(intent);
         }
-
-        SeekBar seek = (SeekBar) findViewById(R.id.volumeBar);
-
-        Json.put("Volume", seek.getProgress());
-        Json.put("Type", AlarmType);
-        Json.put("Latitude", getIntent().getDoubleExtra("Latitude", 0));
-        Json.put("Longitude", getIntent().getDoubleExtra("Longitude", 0));
-        //endregion
-
-        //region WriteFile
-        for (int i = 0; i < text.size(); i++) {
-            //Combine old string with the listobject
-            if (getIntent().getIntExtra("Id", -1) == json.get(i).getInt("Id")) {
-            } else {
-                JsonString = JsonString + text.get(i) + "\n";
-            }
-        }
-
-        JsonString = JsonString + Json.toString();
-
-        FileWriter out;
-        try {
-            //Write to file
-            out = new FileWriter(new File(Root, "Alarms.json"));
-            out.append(JsonString);
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //endregion
-
-        Intent intent = new Intent(this, Main.class);
-        setResult(RESULT_OK, intent);
-        finish();
-        startActivity(intent);
-
     }
 
     public void dateButton_click(View view) {
@@ -384,69 +233,89 @@ public class NewAlarm extends Activity {
         dialog.setTitle("Pick day(s) to repeat");
         dialog.setContentView(R.layout.dialog_datepicker);
 
+        dates = null;
+        dates = new ArrayList<>();
+
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog);
 
-
-        Calendar c = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance();
         CalendarView calendarView = (CalendarView) dialog.findViewById(R.id.calendarView);
         calendarView.setFirstDayOfWeek(Calendar.SUNDAY);
-        calendarView.setMinDate(c.getTimeInMillis() - 1200);
+        calendarView.setMinDate(cal.getTimeInMillis() - 1200);
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            ArrayList<String> dates = new ArrayList<>();
 
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-
-                int i = 0;
                 String text = "";
-                TextView tv = (TextView) dialog.findViewById(R.id.calDateText);
-                CalendarView CV = (CalendarView) dialog.findViewById(R.id.calendarView);
+                int i = 0;
 
-                Date = new SimpleDateFormat("dd-MM-yyyy").format(new Date(CV.getDate()));
+                TextView calendarDateText = (TextView) dialog.findViewById(R.id.calendarDateText);
 
+                //Set the date, set time vars to 0
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+                Date date = new Date();
+                date.setTime(calendar.getTimeInMillis());
 
-                if (!dates.contains(Date + ", "))
-                    dates.add(Date + ", ");
-                else if (dates.contains(Date + ", "))
-                    dates.remove(Date + ", ");
+                //Add date to list if it doesn't contain it already
+                if (!dates.contains(date))
+                    dates.add(date);
+                else if (dates.contains(date))
+                    dates.remove(date);
 
+                //Translate the date from a date object to a string
                 while (i < dates.size()) {
-                    text = text + dates.get(i);
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                    String dateS = formatter.format(dates.get(i));
+                    text = text + dateS + ", ";
                     i++;
                 }
+
                 if (dates.size() >= 1)
-                    tv.setText(text.toString().substring(0, text.length() - 2));
+                    calendarDateText.setText(text.toString().substring(0, text.length() - 2));
                 else
-                    tv.setText("No dates selected");
+                    calendarDateText.setText("No dates selected");
             }
         });
 
-        //region SaveButton
-        Button saveButton = (Button) dialog.findViewById(R.id.saveCalButton);
+        //SaveButton
+        Button saveButton = (Button) dialog.findViewById(R.id.calendarSaveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TextView tv = (TextView) dialog.findViewById(R.id.calDateText);
-                Date = tv.getText().toString();
-                TextView dc = (TextView) findViewById(R.id.dateContent);
-                dc.setText(Date);
+                String text = "";
+                int i = 0;
+
+
+                while (i < dates.size()) {
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                    String dateS = formatter.format(dates.get(i));
+                    text = text + dateS + ", ";
+                    DaysOfWeek = null;
+                    DaysOfWeek = new ArrayList<String>();
+                    i++;
+                }
+
+                dateText.setText((text.toString().substring(0, text.length() - 2)));
                 dialog.dismiss();
-
-
             }
         });
-        //endregion
 
-        //region CancelButton
-        Button cancelButton = (Button) dialog.findViewById(R.id.cancelCalButton);
+        //CancelButton
+        Button cancelButton = (Button) dialog.findViewById(R.id.calendarCancelButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dates = null;
+                dates = new ArrayList<Date>();
                 dialog.dismiss();
             }
         });
-        //endregion
 
         dialog.show();
     }
@@ -463,6 +332,11 @@ public class NewAlarm extends Activity {
         saveDayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DaysOfWeek = null;
+                DaysOfWeek = new ArrayList<String>();
+                String text = "";
+                int i = 0;
+
                 CheckBox checkBoxSunday = (CheckBox) dialog.findViewById(R.id.checkBoxSunday);
                 CheckBox checkBoxMonday = (CheckBox) dialog.findViewById(R.id.checkBoxMonday);
                 CheckBox checkBoxTuesday = (CheckBox) dialog.findViewById(R.id.checkBoxTuesday);
@@ -471,25 +345,34 @@ public class NewAlarm extends Activity {
                 CheckBox checkBoxFriday = (CheckBox) dialog.findViewById(R.id.checkBoxFriday);
                 CheckBox checkBoxSaturday = (CheckBox) dialog.findViewById(R.id.checkBoxSaturday);
 
-                DaysOfWeek = "";
                 if (checkBoxSunday.isChecked())
-                    DaysOfWeek += "Sunday, ";
+                    DaysOfWeek.add("Sunday");
                 if (checkBoxMonday.isChecked())
-                    DaysOfWeek += "Monday, ";
+                    DaysOfWeek.add("Monday");
                 if (checkBoxTuesday.isChecked())
-                    DaysOfWeek += "Tuesday, ";
+                    DaysOfWeek.add("Tuesday");
                 if (checkBoxWednesday.isChecked())
-                    DaysOfWeek += "Wednesday, ";
+                    DaysOfWeek.add("Wednesday");
                 if (checkBoxThursday.isChecked())
-                    DaysOfWeek += "Thursday, ";
+                    DaysOfWeek.add("Thursday");
                 if (checkBoxFriday.isChecked())
-                    DaysOfWeek += "Friday, ";
+                    DaysOfWeek.add("Friday");
                 if (checkBoxSaturday.isChecked())
-                    DaysOfWeek += "Saturday, ";
-                if (!DaysOfWeek.equals(""))
-                    Date = DaysOfWeek.substring(0, DaysOfWeek.length() - 2);
-                TextView dc = (TextView) findViewById(R.id.dateContent);
-                dc.setText(Date);
+                    DaysOfWeek.add("Saturday");
+                if (DaysOfWeek.size() == 0)
+                    save_Daily = DaysOfWeek;
+
+
+                while (i < DaysOfWeek.size()) {
+                    text = text + DaysOfWeek.get(i) + ", ";
+                    i++;
+                }
+
+
+                dates = null;
+                dates = new ArrayList<Date>();
+
+                dateText.setText((text.toString().substring(0, text.length() - 2)));
                 dialog.dismiss();
             }
         });
@@ -505,10 +388,6 @@ public class NewAlarm extends Activity {
         });
         //endregion
         dialog.show();
-    }
-
-    public void cancelButton_click(View view) {
-        setContentView(R.layout.newalarm);
     }
 
     public void alarmToneButton_click(View view) {
@@ -534,7 +413,7 @@ public class NewAlarm extends Activity {
         dialog.setTitle("Select the alarm type");
         dialog.setContentView(R.layout.dialog_typepicker);
 
-        final Button typeButton = (Button) this.findViewById(R.id.typeButton);
+        final Button typeButton = (Button) this.findViewById(R.id.alarmTypeButton);
         Button vibrationButton = (Button) dialog.findViewById(R.id.vibrationTypeButton);
 
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog);
@@ -542,7 +421,7 @@ public class NewAlarm extends Activity {
         vibrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlarmType = 0;
+                save_Type = 0;
                 typeButton.setText("Vibration alarm");
                 dialog.dismiss();
             }
@@ -552,7 +431,7 @@ public class NewAlarm extends Activity {
         soundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlarmType = 1;
+                save_Type = 1;
                 typeButton.setText("Sound alarm");
                 dialog.dismiss();
             }
@@ -562,7 +441,7 @@ public class NewAlarm extends Activity {
         bothButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlarmType = 2;
+                save_Type = 2;
                 typeButton.setText("Sound and vibration alarm");
                 dialog.dismiss();
             }
@@ -572,7 +451,8 @@ public class NewAlarm extends Activity {
         notificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlarmType = 3;
+                save_Type = 3;
+                typeButton.setText("Notification");
                 dialog.dismiss();
             }
         });
@@ -582,145 +462,301 @@ public class NewAlarm extends Activity {
     }
 
     public void locationButton_click(View view) {
-        Button thb = (Button) findViewById(R.id.timeHourButton);
-        Button tmb = (Button) findViewById(R.id.timeMinuteButton);
-        EditText et = (EditText) findViewById(R.id.alarmName);
-
-        ArrayList<Integer> Ids = new ArrayList<>();
+        prepareData(false);
 
         Intent intent = new Intent(this, MapsActivity.class);
-        int id = -1;
-        String hourtext = thb.getText().toString();
-        String minutetext = tmb.getText().toString();
-        String alarmname = et.getText().toString();
-
-
-        int max = -1;
-        if (Ids.size() != 0)
-            max = Collections.max(Ids);
-        if (getIntent().getIntExtra("Id", -1) == -1) {
-            max = max + 1;
-            id = max;
-        } else
-            id = getIntent().getIntExtra("Id", -1);
-
-        String hour = hourtext;
-        String minute = minutetext;
-        String name = alarmname;
-        String date;
-
-        if (Date != null && !Date.equals("No dates selected"))
-            date = Date;
-        else {
-            Calendar c = Calendar.getInstance();
-            int CurHour = c.get(Calendar.HOUR_OF_DAY);
-            int CurMinute = c.get(Calendar.MINUTE);
-
-            int AlarmHour = Integer.parseInt(hourtext);
-            int AlarmMinute = Integer.parseInt(minutetext);
-
-
-            int curDay = c.get(Calendar.DAY_OF_MONTH);
-            int curMonth = c.get(Calendar.MONTH) + 1;
-            int curYear = c.get(Calendar.YEAR);
-            int CurTimeInmins = CurHour * 60 + CurMinute;
-            int AlarmTimeInMins = AlarmHour * 60 + AlarmMinute;
-
-            if (CurTimeInmins < AlarmTimeInMins) {
-                String CurrentDate;
-
-                if (curDay < 10)
-                    CurrentDate = "0" + curDay + "-" + curMonth + "-" + curYear;
-                else if (curDay < 10 && curMonth < 10)
-                    CurrentDate = "0" + curDay + "-0" + curMonth + "-" + curYear;
-                else if (curMonth < 10)
-                    CurrentDate = curDay + "-0" + curMonth + "-" + curYear;
-                else
-                    CurrentDate = curDay + "-" + curMonth + "-" + curYear;
-                date = CurrentDate;
-            } else {
-                String TomorrahDate;
-                if (curDay < 10) {
-                    curDay++;
-                    TomorrahDate = "0" + curDay + "-" + curMonth + "-" + curYear;
-                } else if (curDay < 10 && curMonth < 10) {
-                    curDay++;
-                    TomorrahDate = "0" + curDay + "-0" + curMonth + "-" + curYear;
-                } else if (curMonth < 10) {
-                    curDay++;
-                    TomorrahDate = curDay + "-0" + curMonth + "-" + curYear;
-                } else {
-                    curDay++;
-                    TomorrahDate = curDay + "-" + curMonth + "-" + curYear;
-                }
-
-                date = TomorrahDate;
-            }
-        }
-
-
-        String tone = FName;
-        if (FName == null) {
-            AlarmType = 0;
-        }
-        SeekBar seek = (SeekBar) findViewById(R.id.volumeBar);
-        int volume = seek.getProgress();
-
-        int type = AlarmType;
-        String location = getIntent().getStringExtra("LongAndLat");
-
-
-        intent.putExtra("Id", id);
-        intent.putExtra("Hour", hour);
-        intent.putExtra("Minute", minute);
-        intent.putExtra("Name", name);
-        intent.putExtra("Date", date);
-        intent.putExtra("Tone", tone);
-        intent.putExtra("Volume", volume);
-        intent.putExtra("Type", type);
-        intent.putExtra("Location", location);
         startActivity(intent);
     }
 
-    public void save() {
-        TempSaveList.clear();
-        Button thb = (Button) findViewById(R.id.timeHourButton);
-        Button tmb = (Button) findViewById(R.id.timeMinuteButton);
-        EditText an = (EditText) findViewById(R.id.alarmName);
-        TextView dc = (TextView) findViewById(R.id.dateContent);
+    public void prepareData(boolean saveToFile) {
+        File Root = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/");
+        File file = new File(Root, "Alarms.json");
+        cancelSave = false;
+        ArrayList<Integer> Ids = new ArrayList<>();
 
-        TempSaveList.add(thb.getText().toString());
-        TempSaveList.add(tmb.getText().toString());
-        TempSaveList.add(an.getText().toString());
-        TempSaveList.add(dc.getText().toString());
-    }
-
-    public void loadAfterRedirect() {
+        //ReadFile
         try {
-            ArrayList<String> IntentList = getIntent().getStringArrayListExtra("List");
-            int i = 0;
-            while (i < IntentList.size()) {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            //Read the file line by line
+            while ((line = br.readLine()) != null) {
+                JSONObject obj = new JSONObject(line);
+                Ids.add(obj.getInt("Id"));
+            }
+            br.close();
+        } catch (Exception Ex) {
+            System.out.println(Ex);
+        }
 
-                TempSaveList.add(IntentList.get(i));
-                i++;
+        Integer Id;
+        String Name;
+        ArrayList<Date> DateTime;
+        ArrayList<String> Daily;
+        int Type;
+        String Tone;
+        int Volume;
+        double Latitude;
+        double Longitude;
+        int LocationRadius;
+
+        //Id
+        int max = -1;
+        if (Ids.size() != 0)
+            max = Collections.max(Ids);
+
+        if (Data.Id == null)
+            Id = max + 1;
+        else
+            Id = Data.Id;
+
+        //Name
+        if (alarmName.getText().toString() + "" != "")
+            Name = alarmName.getText().toString();
+        else
+            Name = "New Alarm " + (Id + 1);
+
+        //DateTime
+        DateTime = new ArrayList<>();
+        if (dates.size() != 0) {
+            for (int i = 0; i < dates.size(); i++) {
+                Date date = dates.get(i);
+                int removed = 0;
+
+                Calendar calendar = Calendar.getInstance();
+                Long currentTime = calendar.getTimeInMillis();
+                calendar.setTime(date);
+                Long setTime = calendar.getTimeInMillis();
+                calendar.set(Calendar.HOUR_OF_DAY, Hours);
+                calendar.set(Calendar.MINUTE, Minutes);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+
+                Date finaldate = new Date();
+                finaldate.setTime(calendar.getTimeInMillis());
+
+                //If the set time is smaller than the current time the alarm won't go off and should not save.
+                if (setTime <= currentTime) {
+                    Toast.makeText(this, "Date/Time combination can't be in the past", Toast.LENGTH_SHORT).show();
+                    saveToFile = false;
+                    cancelSave = true;
+                    dates.remove(i);
+                    removed++;
+                } else {
+                    cancelSave = false;
+                    dates.set(i - removed, finaldate);
+                }
             }
 
-            Button thb = (Button) findViewById(R.id.timeHourButton);
-            Button tmb = (Button) findViewById(R.id.timeMinuteButton);
-            EditText an = (EditText) findViewById(R.id.alarmName);
-            TextView dc = (TextView) findViewById(R.id.dateContent);
 
-            thb.setText(TempSaveList.get(0));
-            tmb.setText(TempSaveList.get(1));
-            an.setText(TempSaveList.get(2));
-            Hours = Integer.parseInt(TempSaveList.get(0));
-            Minutes = Integer.parseInt(TempSaveList.get(1));
-            Date = getIntent().getStringExtra("Dates");
-            dc.setText(Date);
+            DateTime = dates;
 
-        } catch (Exception e) {
-            System.out.println("Error: " + e + ", the NullPointerException is normal on startup. ");
+        } else if (dates.size() == 0 && DaysOfWeek.size() == 0) {
+            long datelong;
+            Calendar calendar = Calendar.getInstance();
+            Long currentTime = calendar.getTimeInMillis();
+            calendar.set(Calendar.HOUR_OF_DAY, Hours);
+            calendar.set(Calendar.MINUTE, Minutes);
+            Long setTime = calendar.getTimeInMillis();
 
+            //Because there is only one date it is safe to change the date to the date of tomorrow.
+            if (setTime <= currentTime) {
+                setTime = setTime + 86400000;
+            }
+            datelong = setTime;
+
+            Date dateTime = new Date(datelong);
+
+            DateTime.add(dateTime);
         }
+
+        //Daily
+        Daily = new ArrayList<>();
+        if (DaysOfWeek.size() != 0) {
+            Date zero =  new Date();
+            zero.setTime(0);
+            long datelong;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(zero);
+            calendar.set(Calendar.HOUR_OF_DAY, Hours);
+            calendar.set(Calendar.MINUTE, Minutes);
+            Long setTime = calendar.getTimeInMillis();
+
+            datelong = setTime;
+
+            Date dateTime = new Date(datelong);
+
+            DateTime.add(dateTime);
+        }
+
+        for (int i = 0; i < DaysOfWeek.size(); i++) {
+            Daily.add(DaysOfWeek.get(i));
+        }
+
+        //Tone & Type
+        Tone = ToneFullName;
+        if (ToneFullName == null) {
+            Type = 0;
+            Tone = "";
+        } else {
+            Type = save_Type;
+        }
+
+        //Volume
+        SeekBar seek = (SeekBar) findViewById(R.id.volumeBar);
+        Volume = seek.getProgress();
+
+        //Latitude,Longitude, Location Type and Location Radius
+        if (Data.Latitude != null)
+            Latitude = Data.Latitude;
+        else
+            Latitude = 100d;
+
+        if (Data.Latitude != null)
+            Longitude = Data.Longitude;
+        else
+            Longitude = 200d;
+
+        if (Data.Latitude != null)
+            LocationRadius = Data.LocationRadius;
+        else
+            LocationRadius = 10;
+
+
+        Data.Id = Id;
+        Data.Name = Name;
+        Data.DateTime = DateTime;
+        Data.Daily = Daily;
+        Data.Volume = Volume;
+        Data.Tone = Tone;
+        Data.Type = Type;
+        Data.Latitude = Latitude;
+        Data.Longitude = Longitude;
+        Data.LocationRadius = LocationRadius;
+
+        saveData(Id, Name, DateTime, Daily, Tone, Volume, Type, Latitude, Longitude, LocationRadius, saveToFile);
+
+    }
+
+    public void saveData(int _Id, String _Name, ArrayList<Date> _DateTime, ArrayList<String> _Daily, String _Tone, int _Volume, int _Type, double _Latitude, double _Longitude, int _LocationRadius, boolean saveToFile) {
+        File Root = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/");
+        File file = new File(Root, "Alarms.json");
+
+        if (saveToFile) {
+            JSONObject Json = new JSONObject();
+            try {
+                Json.put("Id", _Id);
+                Json.put("Name", _Name);
+                Json.put("Type", _Type);
+                Json.put("DateTime", _DateTime);
+                Json.put("Daily", _Daily);
+                Json.put("Tone", _Tone);
+                Json.put("Volume", _Volume);
+                Json.put("Latitude", _Latitude);
+                Json.put("Longitude", _Longitude);
+                Json.put("LocationRadius", _LocationRadius);
+            } catch (JSONException e) {
+                Toast.makeText(this, "Error: " + e, Toast.LENGTH_SHORT).show();
+            }
+
+            String text = "";
+            //ReadFile
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String line;
+                //Read the file line by line
+                while ((line = br.readLine()) != null) {
+                    JSONObject obj = new JSONObject(line);
+                    if (obj.getInt("Id") != _Id)
+                        text = text + line + "\n";
+                }
+                br.close();
+            } catch (Exception Ex) {
+                System.out.println(Ex);
+            }
+
+            text = text + Json.toString();
+
+                    FileWriter out;
+            try {
+                //Write to file
+                out = new FileWriter(new File(Root, "Alarms.json"));
+                out.append(text);
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void populateView(String _Name, ArrayList<Date> _DateTime, ArrayList<String> _Daily, String _Tone, int _Volume, int _Type) {
+        showdate = "";
+
+        //Name
+        alarmName.setText(_Name);
+
+        //Time
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(_DateTime.get(0));
+
+        String SHour;
+        String SMinute;
+
+        if (cal.get(Calendar.HOUR_OF_DAY) < 10)
+            SHour = "0" + cal.get(Calendar.HOUR_OF_DAY);
+        else
+            SHour = "" + cal.get(Calendar.HOUR_OF_DAY);
+
+        if (cal.get(Calendar.MINUTE) < 10)
+            SMinute = "0" + cal.get(Calendar.MINUTE);
+        else
+            SMinute = "" + cal.get(Calendar.MINUTE);
+
+        Hours = cal.get(Calendar.HOUR_OF_DAY);
+        Minutes = cal.get(Calendar.MINUTE);
+        timeHourButton.setText(SHour);
+        timeMinuteButton.setText(SMinute);
+
+        //Type
+        if (_Type == 0) {
+            typeButton.setText("Vibration alarm");
+        } else if (_Type == 1) {
+            typeButton.setText("Sound alarm");
+        } else if (_Type == 2) {
+            typeButton.setText("Sound and Vibration alarm");
+        } else if (_Type == 3) {
+            typeButton.setText("Notification");
+        }
+
+        //Date & Daily
+        if (_Daily != null) {
+            for (int i = 0; i < _Daily.size(); i++) {
+                showdate = showdate + _Daily.get(i) + ", ";
+                DaysOfWeek.add(_Daily.get(i));
+            }
+            showdate = showdate.toString().substring(0, showdate.length() - 2);
+            dateText.setText(showdate);
+        } else if (_DateTime != null) {
+            for (int i = 0; i < _DateTime.size(); i++) {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                String dateS = formatter.format(_DateTime.get(i));
+                showdate = showdate + dateS + ", ";
+                dates.add(_DateTime.get(i));
+            }
+            showdate = showdate.toString().substring(0, showdate.length() - 2);
+            dateText.setText(showdate);
+        }
+
+
+        //Tone
+        if (_Tone != null) {
+            ToneFullName = _Tone;
+            ToneFileNameParts = ToneFullName.split("/");
+            toneButton.setText("Alarm tone: " + ToneFileNameParts[ToneFileNameParts.length - 1]);
+        } else {
+            ToneFullName = "";
+        }
+
+        //Volume
+        volumeBar.setProgress(_Volume);
     }
 }

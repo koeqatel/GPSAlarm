@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NewAlarm"
+            android:name=".Rewrite.NewAlarm"
             android:noHistory="false" />
         <activity
             android:name=".CalendarClass"
@@ -34,7 +34,7 @@
             android:noHistory="true" />
 
         <service
-            android:name=".GPSAlarmService"
+            android:name=".Rewrite.GPSAlarmService"
             android:enabled="true"
             android:exported="true"></service><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->

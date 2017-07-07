@@ -1,15 +1,11 @@
 package xyz.snsstudio.gpsalarm;
 
 import android.app.Activity;
-import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -29,13 +25,14 @@ public class Alarm extends Activity {
         try {
             float volume;
             volume = getIntent().getIntExtra("Volume", 75) / 100.0f;
-
+            //TODO: Write Vibration.
             mediaPlayer.setDataSource(this, Uri.parse(getIntent().getStringExtra("Tone")));
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
             mediaPlayer.setLooping(true);
             mediaPlayer.prepare();
             mediaPlayer.setVolume(volume, volume);
-            mediaPlayer.start();
+            //TODO: I disabled this for testing purposes.
+//            mediaPlayer.start();
 
         } catch (IOException e) {
             e.printStackTrace();

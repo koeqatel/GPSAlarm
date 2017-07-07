@@ -12,7 +12,7 @@
 
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -21,13 +21,13 @@
 
 
     <Button
-        android:id="@+id/AddDateTimeButton"
+        android:id="@+id/newAlarmButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_gravity="right"
         android:textColor="#ff7129"
         android:textSize="20dp"
         android:background="@drawable/button_bg_round"
-        android:onClick="AddDateTimeButton"
+        android:onClick="newAlarmButton_click"
         android:text="➕"/>
 </LinearLayout>

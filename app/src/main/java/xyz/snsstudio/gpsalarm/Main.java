@@ -9,7 +9,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -43,9 +48,10 @@ public class Main extends Activity {
 
         startService(new Intent(this, GPSAlarmService.class));
 
-        //region CreateList
-        ListView lview = (ListView) findViewById(android.R.id.list);
+        //CreateList
+        ListView lview = (ListView) findViewById(R.id.list);
         populateList();
+
         final lvAdapter adapter = new lvAdapter(this, list);
         lview.setAdapter(adapter);
         lview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -55,15 +61,14 @@ public class Main extends Activity {
                 selectedFromList = (parent.getAdapter().getItem(position).toString());
                 String[] list = selectedFromList.split(": =");
                 String idString = list[2].substring(0, list[2].indexOf(","));
-                editModal(Integer.parseInt(idString));
-
+                editDialog(Integer.parseInt(idString));
             }
         });
-        //endregion
     }
 
-    public void editModal(final int Id) {
+    public void editDialog(final int Id) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
+//        alert.setTitle("What would you like to do with " + Id + "?");
         alert.setTitle("What would you like to do?");
 
         alert.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
@@ -82,30 +87,66 @@ public class Main extends Activity {
                         int id = obj.getInt("Id");
                         if (id == Id) {
                             //Here I get the items from the Json and push them to NewAlarm
-                            String Hour = obj.getString("Hour");
-                            String Minute = obj.getString("Minute");
                             String Name = obj.getString("Name");
-                            String Date = obj.getString("Date");
+//                            String Daily = obj.getString("Daily");
+                            int Volume = obj.getInt("Volume");
                             String Tone = obj.getString("Tone");
-                            String Volume = obj.getString("Volume");
                             Integer Type = obj.getInt("Type");
                             double Latitude = obj.getDouble("Latitude");
                             double Longitude = obj.getDouble("Longitude");
+                            Integer LocRad = obj.getInt("LocationRadius");
+
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+
+                            ArrayList<String> daysOfWeek = new ArrayList<String>();
+                            ArrayList<Date> datelist = new ArrayList<>();
+                            Date convertedDate = new Date();
+                            String[] Daily;
+                            String[] DateTimes;
+                            String DateTime;
+                            String dailyString;
 
 
-                            intent.putExtra("Id", Id);
-                            intent.putExtra("Hour", Hour);
-                            intent.putExtra("Minute", Minute);
-                            intent.putExtra("Name", Name);
-                            intent.putExtra("Date", Date);
-                            intent.putExtra("Tone", Tone);
-                            intent.putExtra("Volume", Volume);
-                            intent.putExtra("Type", Type);
-                            intent.putExtra("Latitude", Latitude);
-                            intent.putExtra("Longitude", Longitude);
+                            DateTime = obj.getString("DateTime");
+                            DateTime = DateTime.replace("[", "");
+                            DateTime = DateTime.replace("]", "");
+                            DateTimes = DateTime.split(",");
+                            for (int i = 0; i < DateTimes.length; i++) {
+
+                                try {
+                                    convertedDate = dateFormat.parse(DateTimes[i]);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
+                                datelist.add(convertedDate);
+                            }
+
+                            dailyString = obj.getString("Daily");
+                            dailyString = dailyString.replace("[", "");
+                            dailyString = dailyString.replace("]", "");
+                            Daily = dailyString.split(", ");
+
+                            for (int i = 0; i < Daily.length; i++)  {
+                                daysOfWeek.add(Daily[i]);
+                            }
+
+                            Data data = new Data();
+                            data.Id = Id;
+                            data.Name = Name;
+                            data.DateTime = datelist;
+                            data.Daily = daysOfWeek;
+                            data.Volume = Volume;
+                            data.Tone = Tone;
+                            data.Type = Type;
+                            data.Latitude = Latitude;
+                            data.Longitude = Longitude;
+                            data.LocationRadius = LocRad;
+
                         }
                     }
                     br.close();
+                    intent.putExtra("Repopulate", true);
                     startActivity(intent);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -126,6 +167,7 @@ public class Main extends Activity {
                     while ((line = br.readLine()) != null) {
                         JSONObject obj = new JSONObject(line);
                         int id = obj.getInt("Id");
+                        //Unless the id equals the id of the clicked one
                         if (id != Id) {
                             text.add(obj);
                         }
@@ -174,7 +216,7 @@ public class Main extends Activity {
         File file = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/", "Alarms.json");
         int id;
 
-        //region ReadFile
+        //ReadFile
         ArrayList<JSONObject> text = new ArrayList<>();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -188,37 +230,105 @@ public class Main extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //endregion
 
-        //region PopulateList
+        //Prepare List items
+        String Time = "Time";
+        String Name = "Name";
+        String Date = "Date";
+        int Id = -1;
+
+        //PopulateList
         for (id = 0; id < text.size(); id++) {
+            ArrayList<Date> datelist = new ArrayList<>();
 
             JSONObject Json = text.get(id);
+            Date convertedDate = new Date();
+            Calendar calendar = Calendar.getInstance();
+
             try {
+                Id = Json.getInt("Id");
+                Name = Json.getString("Name");
 
-                HashMap temp = new HashMap();
-                temp.put(TIME_TEXT, Json.getString("Hour") + ":" + Json.getString("Minute"));
-                temp.put(ALARM_NAME_TEXT, Json.getString("Name"));
-                if (Json.getString("Date") != "EmptyDate")
-                    temp.put(REPEAT_TEXT, Json.getString("Date"));
-                if (Json.getString("Id") != "EmptyId")
-                    temp.put(ID_INT, Json.getString("Id"));
+                String[] DateTimes;
+                String DateTime = Json.getString("DateTime");
+                DateTime = DateTime.replace("[", "");
+                DateTime = DateTime.replace("]", "");
+                DateTimes = DateTime.split(", ");
 
-                list.add(temp);
+                SimpleDateFormat standardDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                SimpleDateFormat getFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
 
+                try {
+                    convertedDate = getFormat.parse(DateTimes[0]);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                String checkDate = standardDateFormat.format(convertedDate);
 
+                if (checkDate.equals("01-01-1970")) {
+                    //region Daily
+                    String daily = Json.getString("Daily");
+                    daily = daily.replace("[", "");
+                    daily = daily.replace("]", "");
+                    Date = daily;
+
+                    //endregion
+                } else {
+                    //region DateTime
+                    Date = "";
+                    for (int i = 0; i < DateTimes.length; i++) {
+                        convertedDate = null;
+                        convertedDate = new Date();
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+
+                        try {
+                            convertedDate = dateFormat.parse(DateTimes[i]);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        datelist.add(convertedDate);
+                    }
+
+                    for (int i = 0; i < datelist.size(); i++) {
+                        String showDate;
+                        Date tempDate = datelist.get(i);
+                        calendar.setTime(tempDate);
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                        showDate = dateFormat.format(tempDate);
+
+                        Date = Date + showDate + ", ";
+                    }
+                    //endregion
+                }
             } catch (JSONException e) {
-                e.printStackTrace();
+                Toast.makeText(this, "A Json error occured, please contact the writer.", Toast.LENGTH_SHORT).show();
             }
+            if (Date != "")
+                Date = Date.toString().substring(0, Date.length() - 2);
+            calendar.setTime(convertedDate);
 
+            Calendar cal = Calendar.getInstance();
+            cal.clear();
+            cal.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
+            cal.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
+
+            Date date = new Date();
+            date.setTime(cal.getTimeInMillis());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+            Time = dateFormat.format(date);
+
+            HashMap temp = new HashMap();
+            temp.put(TIME_TEXT, Time);
+            temp.put(ALARM_NAME_TEXT, Name);
+            temp.put(REPEAT_TEXT, Date);
+            temp.put(ID_INT, Id);
+            list.add(temp);
         }
-        //endregion
     }
 
-    public void AddDateTimeButton(View view) {
+    public void newAlarmButton_click(View view) {
         finish();
         Intent intent = new Intent(this, NewAlarm.class);
         startActivity(intent);
     }
-
 }

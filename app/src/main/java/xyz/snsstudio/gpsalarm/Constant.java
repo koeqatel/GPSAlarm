@@ -1,7 +1,5 @@
 package xyz.snsstudio.gpsalarm;
 
-import java.util.ArrayList;
-
 public class Constant {
     public static String ID_INT = "ID: ";
     public static String TIME_TEXT = "Time: ";

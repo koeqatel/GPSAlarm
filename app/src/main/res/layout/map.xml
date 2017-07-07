@@ -17,7 +17,7 @@
             android:layout_weight="2" />
 
         <Button
-            android:id="@+id/cancelButton"
+            android:id="@+id/mapCancelButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -25,37 +25,13 @@
             android:text="Cancel" />
 
         <Button
-            android:id="@+id/saveButton"
+            android:id="@+id/mapSaveButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:onClick="mapSaveButton_click"
             android:text="Save" />
     </LinearLayout>
-
-
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2">
-
-        <RadioButton
-            android:id="@+id/stillAt_check"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:checked="true"
-            android:text="When still at location" />
-
-        <RadioButton
-            android:id="@+id/arrivedAt_check"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="When arrived at location" />
-    </RadioGroup>
-
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:map="http://schemas.android.com/apk/res-auto"

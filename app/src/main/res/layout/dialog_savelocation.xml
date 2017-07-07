@@ -2,30 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#b9b9b9"
     android:orientation="vertical"
-    android:paddingBottom="10dp"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="10dp">
+    android:background="#b9b9b9">
 
-    <CalendarView
-        android:id="@+id/calendarView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="375dp"/>
-
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10">
 
         <TextView
-            android:id="@+id/calendarDateText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="No dates selected" />
-    </ScrollView>
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start alarm when in " />
+
+        <EditText
+            android:id="@+id/radiusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="meters" />
+    </LinearLayout>
 
     <!--Cancel and Save buttons-->
     <RelativeLayout
@@ -34,22 +38,22 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/calendarCancelButton"
+            android:id="@+id/LocationCancelButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/button_bg_round"
-            android:onClick="calendarCancelButton_click"
+            android:onClick="LocationCancelButton_click"
             android:text="✖"
             android:textColor="#ff0000"
             android:textSize="20dp" />
 
         <Button
-            android:id="@+id/calendarSaveButton"
+            android:id="@+id/LocationSaveButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentRight="true"
             android:background="@drawable/button_bg_round"
-            android:onClick="calendarSaveButton_click"
+            android:onClick="LocationSaveButton_click"
             android:text="✔"
             android:textColor="#007d00"
             android:textSize="20dp" />

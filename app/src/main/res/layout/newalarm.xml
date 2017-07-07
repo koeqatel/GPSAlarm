@@ -166,7 +166,7 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/typeButton"
+            android:id="@+id/alarmTypeButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -198,12 +198,7 @@
                 android:text="Daily"
                 android:textColor="#ffffff" />
 
-            <!--<Button-->
-            <!--android:id="@+id/timeButton"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:text="Time" />-->
+
             <Button
                 android:id="@+id/dateButton"
                 android:layout_width="wrap_content"
@@ -240,7 +235,7 @@
         android:paddingRight="10dp">
 
         <Button
-            android:id="@+id/toneButton"
+            android:id="@+id/alarmToneButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -286,23 +281,23 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/cancelButton"
+            android:id="@+id/newAlarmCancelButton"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_alignParentLeft="true"
             android:background="@drawable/button_bg_round"
-            android:onClick="cancelNewAlarmButton_click"
+            android:onClick="newAlarmCancelButton_click"
             android:text="✖"
             android:textColor="#ff0000"
             android:textSize="30dp" />
 
         <Button
-            android:id="@+id/saveButton"
+            android:id="@+id/newAlarmSaveButton"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_alignParentRight="true"
             android:background="@drawable/button_bg_round"
-            android:onClick="saveNewAlarmButton_click"
+            android:onClick="newAlarmSaveButton_click"
             android:text="✔"
             android:textColor="#007d00"
             android:textSize="20dp" />
