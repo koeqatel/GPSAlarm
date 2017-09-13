@@ -18,6 +18,8 @@ import android.app.Activity;
 import android.widget.Toast;
 
 
+import com.squareup.timessquare.CalendarPickerView;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -38,6 +40,7 @@ public class NewAlarm extends Activity {
     String[] ToneFileNameParts; //UFFName
     int Hours = 6;
     int Minutes = 0;
+    int SnoozeDelay;
     String showdate;
     boolean cancelSave = false;
     ArrayList<Date> dates = new ArrayList<>();
@@ -53,6 +56,7 @@ public class NewAlarm extends Activity {
     Button toneButton;
     SeekBar volumeBar;
     Button locationButton;
+    Button snoozeDelayButton;
 
     int save_Id;
     String save_Name;
@@ -64,6 +68,7 @@ public class NewAlarm extends Activity {
     double save_Latitude;
     double save_Longitude;
     int save_LocationRadius;
+    int save_SnoozeDelay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +86,7 @@ public class NewAlarm extends Activity {
         toneButton = (Button) findViewById(R.id.alarmToneButton);
         volumeBar = (SeekBar) findViewById(R.id.volumeBar);
         locationButton = (Button) findViewById(R.id.locationButton);
+        snoozeDelayButton = (Button) findViewById(R.id.SnoozeDelayButton);
 
         if (getIntent().getBooleanExtra("Repopulate", false)) {
             save_Id = Data.Id;
@@ -93,8 +99,9 @@ public class NewAlarm extends Activity {
             save_Latitude = Data.Latitude;
             save_Longitude = Data.Longitude;
             save_LocationRadius = Data.LocationRadius;
+            save_SnoozeDelay = Data.SnoozeDelay;
 
-            populateView(Data.Name, Data.DateTime, Data.Daily, Data.Tone, Data.Volume, Data.Type);
+            populateView(Data.Name, Data.SnoozeDelay, Data.DateTime, Data.Daily, Data.Tone, Data.Volume, Data.Type);
         }
     }
 
@@ -123,7 +130,6 @@ public class NewAlarm extends Activity {
     }
 
     //region TimeButtons
-
     public void timeUpHourButton_click(View view) {
         if (Hours == 23) {
             Hours = 0;
@@ -203,6 +209,42 @@ public class NewAlarm extends Activity {
     }
     //endregion
 
+    //region SnoozeButtons
+    public void SnoozeUpButton_click(View view) {
+        if (SnoozeDelay == 99) {
+            SnoozeDelay = 0;
+        } else {
+            SnoozeDelay = SnoozeDelay + 1;
+        }
+
+
+        if (Integer.toString(SnoozeDelay).length() == 1) {
+            String SnoozeDelayString = "0" + Integer.toString(SnoozeDelay);
+            snoozeDelayButton.setText(SnoozeDelayString);
+        } else {
+            snoozeDelayButton.setText(Integer.toString(SnoozeDelay));
+        }
+
+    }
+
+    public void SnoozeDownButton_click(View view) {
+        if (SnoozeDelay == 1) {
+            SnoozeDelay = 99;
+        } else {
+            SnoozeDelay = SnoozeDelay - 1;
+        }
+
+
+        if (Integer.toString(SnoozeDelay).length() == 1) {
+            String SnoozeDelayString = "0" + Integer.toString(SnoozeDelay);
+            snoozeDelayButton.setText(SnoozeDelayString);
+        } else {
+            snoozeDelayButton.setText(Integer.toString(SnoozeDelay));
+        }
+    }
+
+    //endregion
+
     public void newAlarmCancelButton_click(View view) {
         finish();
         Intent intent = new Intent(this, Main.class);
@@ -238,62 +280,34 @@ public class NewAlarm extends Activity {
 
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog);
 
-        Calendar cal = Calendar.getInstance();
-        CalendarView calendarView = (CalendarView) dialog.findViewById(R.id.calendarView);
-        calendarView.setFirstDayOfWeek(Calendar.SUNDAY);
-        calendarView.setMinDate(cal.getTimeInMillis() - 1200);
 
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+        Calendar nextYear = Calendar.getInstance();
+        nextYear.add(Calendar.YEAR, 1);
 
-            @Override
-            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                String text = "";
-                int i = 0;
-
-                TextView calendarDateText = (TextView) dialog.findViewById(R.id.calendarDateText);
-
-                //Set the date, set time vars to 0
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(year, month, dayOfMonth);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MILLISECOND, 0);
-                Date date = new Date();
-                date.setTime(calendar.getTimeInMillis());
-
-                //Add date to list if it doesn't contain it already
-                if (!dates.contains(date))
-                    dates.add(date);
-                else if (dates.contains(date))
-                    dates.remove(date);
-
-                //Translate the date from a date object to a string
-                while (i < dates.size()) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-                    String dateS = formatter.format(dates.get(i));
-                    text = text + dateS + ", ";
-                    i++;
-                }
-
-                if (dates.size() >= 1)
-                    calendarDateText.setText(text.toString().substring(0, text.length() - 2));
-                else
-                    calendarDateText.setText("No dates selected");
-            }
-        });
+        final CalendarPickerView calendar = (CalendarPickerView) dialog.findViewById(R.id.calendarPickerView);
+        Date today = new Date();
+        calendar.init(today, nextYear.getTime()).withSelectedDate(today);
+        calendar.init(today, nextYear.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE);
 
         //SaveButton
         Button saveButton = (Button) dialog.findViewById(R.id.calendarSaveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dates = new ArrayList<Date>(calendar.getSelectedDates());
                 String text = "";
                 int i = 0;
 
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(dates.get(0));
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+                dates.get(0).setTime(calendar.getTimeInMillis());
 
                 while (i < dates.size()) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
                     String dateS = formatter.format(dates.get(i));
                     text = text + dateS + ", ";
                     DaysOfWeek = null;
@@ -301,8 +315,14 @@ public class NewAlarm extends Activity {
                     i++;
                 }
 
-                dateText.setText((text.toString().substring(0, text.length() - 2)));
+                if (dates.size() > 1)
+                    dateText.setText(text.toString().substring(0, text.length() - 2));
+                else if (dates.size() == 1)
+                    dateText.setText(text.toString());
+                else
+                    dateText.setText("No dates selected");
                 dialog.dismiss();
+
             }
         });
 
@@ -316,6 +336,7 @@ public class NewAlarm extends Activity {
                 dialog.dismiss();
             }
         });
+
 
         dialog.show();
     }
@@ -371,8 +392,11 @@ public class NewAlarm extends Activity {
 
                 dates = null;
                 dates = new ArrayList<Date>();
+                if (DaysOfWeek.size() > 1)
+                    dateText.setText(text.toString().substring(0, text.length() - 2));
+                else
+                    dateText.setText(text.toString());
 
-                dateText.setText((text.toString().substring(0, text.length() - 2)));
                 dialog.dismiss();
             }
         });
@@ -498,6 +522,7 @@ public class NewAlarm extends Activity {
         double Latitude;
         double Longitude;
         int LocationRadius;
+        int Snoozedelay;
 
         //Id
         int max = -1;
@@ -515,6 +540,9 @@ public class NewAlarm extends Activity {
         else
             Name = "New Alarm " + (Id + 1);
 
+        //SnoozeDelay
+        Snoozedelay = SnoozeDelay;
+
         //DateTime
         DateTime = new ArrayList<>();
         if (dates.size() != 0) {
@@ -524,18 +552,21 @@ public class NewAlarm extends Activity {
 
                 Calendar calendar = Calendar.getInstance();
                 Long currentTime = calendar.getTimeInMillis();
+
+
                 calendar.setTime(date);
-                Long setTime = calendar.getTimeInMillis();
+
                 calendar.set(Calendar.HOUR_OF_DAY, Hours);
                 calendar.set(Calendar.MINUTE, Minutes);
                 calendar.set(Calendar.SECOND, 0);
                 calendar.set(Calendar.MILLISECOND, 0);
+                Long pickedTime = calendar.getTimeInMillis();
 
                 Date finaldate = new Date();
                 finaldate.setTime(calendar.getTimeInMillis());
 
                 //If the set time is smaller than the current time the alarm won't go off and should not save.
-                if (setTime <= currentTime) {
+                if (pickedTime <= currentTime) {
                     Toast.makeText(this, "Date/Time combination can't be in the past", Toast.LENGTH_SHORT).show();
                     saveToFile = false;
                     cancelSave = true;
@@ -556,6 +587,8 @@ public class NewAlarm extends Activity {
             Long currentTime = calendar.getTimeInMillis();
             calendar.set(Calendar.HOUR_OF_DAY, Hours);
             calendar.set(Calendar.MINUTE, Minutes);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
             Long setTime = calendar.getTimeInMillis();
 
             //Because there is only one date it is safe to change the date to the date of tomorrow.
@@ -572,13 +605,15 @@ public class NewAlarm extends Activity {
         //Daily
         Daily = new ArrayList<>();
         if (DaysOfWeek.size() != 0) {
-            Date zero =  new Date();
+            Date zero = new Date();
             zero.setTime(0);
             long datelong;
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(zero);
             calendar.set(Calendar.HOUR_OF_DAY, Hours);
             calendar.set(Calendar.MINUTE, Minutes);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
             Long setTime = calendar.getTimeInMillis();
 
             datelong = setTime;
@@ -633,11 +668,12 @@ public class NewAlarm extends Activity {
         Data.Longitude = Longitude;
         Data.LocationRadius = LocationRadius;
 
-        saveData(Id, Name, DateTime, Daily, Tone, Volume, Type, Latitude, Longitude, LocationRadius, saveToFile);
+        if (cancelSave == false)
+            saveData(Id, Name, Snoozedelay, DateTime, Daily, Tone, Volume, Type, Latitude, Longitude, LocationRadius, saveToFile);
 
     }
 
-    public void saveData(int _Id, String _Name, ArrayList<Date> _DateTime, ArrayList<String> _Daily, String _Tone, int _Volume, int _Type, double _Latitude, double _Longitude, int _LocationRadius, boolean saveToFile) {
+    public void saveData(int _Id, String _Name, int _SnoozeDelay, ArrayList<Date> _DateTime, ArrayList<String> _Daily, String _Tone, int _Volume, int _Type, double _Latitude, double _Longitude, int _LocationRadius, boolean saveToFile) {
         File Root = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/");
         File file = new File(Root, "Alarms.json");
 
@@ -654,6 +690,7 @@ public class NewAlarm extends Activity {
                 Json.put("Latitude", _Latitude);
                 Json.put("Longitude", _Longitude);
                 Json.put("LocationRadius", _LocationRadius);
+                Json.put("SnoozeDelay", _SnoozeDelay);
             } catch (JSONException e) {
                 Toast.makeText(this, "Error: " + e, Toast.LENGTH_SHORT).show();
             }
@@ -676,7 +713,7 @@ public class NewAlarm extends Activity {
 
             text = text + Json.toString();
 
-                    FileWriter out;
+            FileWriter out;
             try {
                 //Write to file
                 out = new FileWriter(new File(Root, "Alarms.json"));
@@ -688,7 +725,7 @@ public class NewAlarm extends Activity {
         }
     }
 
-    public void populateView(String _Name, ArrayList<Date> _DateTime, ArrayList<String> _Daily, String _Tone, int _Volume, int _Type) {
+    public void populateView(String _Name, int _SnoozeDelay, ArrayList<Date> _DateTime, ArrayList<String> _Daily, String _Tone, int _Volume, int _Type) {
         showdate = "";
 
         //Name
@@ -697,6 +734,14 @@ public class NewAlarm extends Activity {
         //Time
         Calendar cal = Calendar.getInstance();
         cal.setTime(_DateTime.get(0));
+
+        SnoozeDelay = _SnoozeDelay;
+
+        if (cal.get(_SnoozeDelay) < 10)
+            snoozeDelayButton.setText("0" + _SnoozeDelay);
+        else
+            snoozeDelayButton.setText("" + _SnoozeDelay);
+
 
         String SHour;
         String SMinute;
@@ -728,16 +773,16 @@ public class NewAlarm extends Activity {
         }
 
         //Date & Daily
-        if (_Daily != null) {
+        if (_Daily.get(0) != "") {
             for (int i = 0; i < _Daily.size(); i++) {
                 showdate = showdate + _Daily.get(i) + ", ";
                 DaysOfWeek.add(_Daily.get(i));
             }
             showdate = showdate.toString().substring(0, showdate.length() - 2);
             dateText.setText(showdate);
-        } else if (_DateTime != null) {
+        } else {
             for (int i = 0; i < _DateTime.size(); i++) {
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
                 String dateS = formatter.format(_DateTime.get(i));
                 showdate = showdate + dateS + ", ";
                 dates.add(_DateTime.get(i));

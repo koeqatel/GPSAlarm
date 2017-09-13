@@ -9,7 +9,6 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp">
 
-    <!--Alarm Name-->
     <EditText
         android:id="@+id/alarmName"
         android:layout_width="match_parent"
@@ -21,32 +20,26 @@
         android:textColor="#ffffff"
         android:textColorHint="#dddddd" />
 
-    <!--Time and Snooze Buttons-->
+    <!--Time Buttons-->
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="21">
 
-        <!--Empty space-->
         <Space
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="10" />
 
-        <!--The buttons-->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
             android:weightSum="3">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="   Alarm Time   "
-                android:textColor="@android:color/white" />
 
             <!--Top buttons (Up)-->
             <LinearLayout
@@ -161,110 +154,18 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!--Empty space-->
         <Space
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="10" />
-
-        <!--Snooze Buttons-->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:weightSum="3">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Snooze Delay"
-                android:textColor="@android:color/white" />
-
-            <!--Snooze Up Button-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:weightSum="3">
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/SnoozeUpButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:onClick="SnoozeUpButton_click"
-                    android:text="▲"
-                    android:textColor="#ffffff" />
-            </LinearLayout>
-
-            <!--Snooze Delay Button-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:weightSum="3">
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/SnoozeDelayButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:onClick="SnoozeDelayButton_click"
-                    android:text="15"
-                    android:textAlignment="center"
-                    android:textColor="#ffffff" />
-
-            </LinearLayout>
-
-            <!--Bot buttons (Down)-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:weightSum="3">
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/SnoozeDownButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:onClick="SnoozeDownButton_click"
-                    android:text="▼"
-                    android:textColor="#ffffff" />
-
-            </LinearLayout>
-        </LinearLayout>
-
     </LinearLayout>
 
-    <!--Alarm Type Button-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        
 
         <Button
             android:id="@+id/alarmTypeButton"
@@ -277,13 +178,12 @@
             android:textColor="#ffffff" />
     </LinearLayout>
 
-    <!--Daily and Date Button and Info-->
+    <!--Alarm Info-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!--Daily and Date Button-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -312,7 +212,6 @@
                 android:textColor="#ffffff" />
         </LinearLayout>
 
-        <!--Date Info-->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -330,7 +229,6 @@
 
     </LinearLayout>
 
-    <!--Alarm Tone, Volume and Location Buttons and Info-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -338,7 +236,6 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
 
-        <!--Alarm Tone Button-->
         <Button
             android:id="@+id/alarmToneButton"
             android:layout_width="match_parent"
@@ -356,7 +253,6 @@
             android:text="Volume"
             android:textColor="#ffffff" />
 
-        <!--Volumebar-->
         <SeekBar
             android:id="@+id/volumeBar"
             android:layout_width="match_parent"
@@ -364,7 +260,6 @@
             android:max="100"
             android:progress="75" />
 
-        <!--Location Button-->
         <Button
             android:id="@+id/locationButton"
             android:layout_width="match_parent"
@@ -376,7 +271,6 @@
             android:textColor="#ffffff" />
     </LinearLayout>
 
-    <!--Empty yet important space-->
     <Space
         android:layout_width="match_parent"
         android:layout_height="match_parent"

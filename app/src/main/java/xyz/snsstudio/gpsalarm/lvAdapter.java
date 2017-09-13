@@ -48,7 +48,6 @@ public class lvAdapter extends BaseAdapter
         TextView txtFirst;
         TextView txtSecond;
         TextView txtThird;
-        TextView txtFourth;
     }
 
     @Override

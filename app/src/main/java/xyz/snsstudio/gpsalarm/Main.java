@@ -59,6 +59,7 @@ public class Main extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedFromList;
                 selectedFromList = (parent.getAdapter().getItem(position).toString());
+                //TODO: Whats this again?
                 String[] list = selectedFromList.split(": =");
                 String idString = list[2].substring(0, list[2].indexOf(","));
                 editDialog(Integer.parseInt(idString));
@@ -95,12 +96,11 @@ public class Main extends Activity {
                             double Latitude = obj.getDouble("Latitude");
                             double Longitude = obj.getDouble("Longitude");
                             Integer LocRad = obj.getInt("LocationRadius");
+                            Integer SnoozeDelay = obj.getInt("SnoozeDelay");
 
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
 
                             ArrayList<String> daysOfWeek = new ArrayList<String>();
                             ArrayList<Date> datelist = new ArrayList<>();
-                            Date convertedDate = new Date();
                             String[] Daily;
                             String[] DateTimes;
                             String DateTime;
@@ -110,10 +110,13 @@ public class Main extends Activity {
                             DateTime = obj.getString("DateTime");
                             DateTime = DateTime.replace("[", "");
                             DateTime = DateTime.replace("]", "");
-                            DateTimes = DateTime.split(",");
+                            DateTimes = DateTime.split(", ");
                             for (int i = 0; i < DateTimes.length; i++) {
-
+                                Date convertedDate = new Date();
                                 try {
+
+                                    //TODO: Wat the fuck is wrong with this shit?
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
                                     convertedDate = dateFormat.parse(DateTimes[i]);
                                 } catch (ParseException e) {
                                     e.printStackTrace();
@@ -131,17 +134,17 @@ public class Main extends Activity {
                                 daysOfWeek.add(Daily[i]);
                             }
 
-                            Data data = new Data();
-                            data.Id = Id;
-                            data.Name = Name;
-                            data.DateTime = datelist;
-                            data.Daily = daysOfWeek;
-                            data.Volume = Volume;
-                            data.Tone = Tone;
-                            data.Type = Type;
-                            data.Latitude = Latitude;
-                            data.Longitude = Longitude;
-                            data.LocationRadius = LocRad;
+                            Data.Id = Id;
+                            Data.Name = Name;
+                            Data.DateTime = datelist;
+                            Data.Daily = daysOfWeek;
+                            Data.Volume = Volume;
+                            Data.Tone = Tone;
+                            Data.Type = Type;
+                            Data.Latitude = Latitude;
+                            Data.Longitude = Longitude;
+                            Data.LocationRadius = LocRad;
+                            Data.SnoozeDelay = SnoozeDelay;
 
                         }
                     }
@@ -303,8 +306,11 @@ public class Main extends Activity {
             } catch (JSONException e) {
                 Toast.makeText(this, "A Json error occured, please contact the writer.", Toast.LENGTH_SHORT).show();
             }
+            String lastTwoOfDate = Date.substring(Math.max(Date.length() - 2, 0));
+
             if (Date != "")
-                Date = Date.toString().substring(0, Date.length() - 2);
+                if (lastTwoOfDate.equals(", "))
+                    Date = Date.toString().substring(0, Date.length() - 2);
             calendar.setTime(convertedDate);
 
             Calendar cal = Calendar.getInstance();

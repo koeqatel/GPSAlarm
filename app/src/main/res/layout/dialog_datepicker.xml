@@ -9,23 +9,10 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp">
 
-    <CalendarView
-        android:id="@+id/calendarView"
+    <com.squareup.timessquare.CalendarPickerView
+        android:id="@+id/calendarPickerView"
         android:layout_width="match_parent"
         android:layout_height="375dp"/>
-
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/calendarDateText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="No dates selected" />
-    </ScrollView>
 
     <!--Cancel and Save buttons-->
     <RelativeLayout

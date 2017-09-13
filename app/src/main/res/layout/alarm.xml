@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#444444"
@@ -9,33 +9,31 @@
     android:paddingRight="10dp"
     android:paddingTop="10dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
-
-        <Button
-            android:id="@+id/SnoozeButton"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/button_alarm_snooze"
-            android:onClick="snoozeButton"
-            android:text="Zz"
-            android:textColor="#ff6600"
-            android:textSize="40dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/StopButton"
-            android:layout_width="90dp"
+            android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/button_alarm_stop"
-            android:onClick="stopButton"
+            android:background="@drawable/button_alarm_snooze"
+            android:onClick="stopButton_click"
             android:text="X"
             android:textColor="#ff0000"
             android:textSize="40dp" />
 
-    </RelativeLayout>
-</RelativeLayout>
+        <Button
+            android:id="@+id/SnoozeButton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/button_alarm_snooze"
+            android:onClick="snoozeButton_click"
+            android:text="Zz"
+            android:textColor="#ff6600"
+            android:textSize="40dp" />
+
+
+    </LinearLayout>
+</LinearLayout>

@@ -31,4 +31,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:9.0.1'
     compile 'com.google.android.gms:play-services-location:9.0.1'
     testCompile 'junit:junit:4.12'
+    compile 'com.squareup:android-times-square:1.6.5@aar'
 }
