@@ -45,10 +45,7 @@ public class Alarm extends Activity {
             float volume;
             volume = getIntent().getIntExtra("Volume", 75) / 100.0f;
             if (getIntent().getBooleanExtra("Vibrate", false)) {
-                Vibrator v = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
-                long[] pattern = {0, 100, 1000, 100, 100, 100};
-                v.vibrate(pattern, 0);
-
+                vibrate("start");
             }
             //TODO: Write Vibration.
             mediaPlayer.setDataSource(this, Uri.parse(getIntent().getStringExtra("Tone")));
@@ -70,6 +67,7 @@ public class Alarm extends Activity {
         SnoozeTimes = SnoozeTimes + 1;
         Data.SnoozeTimes = SnoozeTimes;
         mediaPlayer.stop();
+        vibrate("stop");
         finish();
     }
 
@@ -77,6 +75,22 @@ public class Alarm extends Activity {
         mediaPlayer.stop();
         Data.Snooze = false;
         Data.SnoozeTimes = 0;
+        vibrate("stop");
         finish();
+    }
+
+    public void vibrate(String command){
+        Vibrator v = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
+        long[] pattern = {0, 200, 1000, 200, 100, 200};
+
+
+        switch (command) {
+            case "start":
+                v.vibrate(pattern, 0);
+                break;
+            case "stop":
+                v.cancel();
+                break;
+        }
     }
 }

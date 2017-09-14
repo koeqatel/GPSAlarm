@@ -15,25 +15,26 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/SnoozeButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_alarm_snooze"
+            android:layout_alignParentTop="true"
+            android:onClick="snoozeButton_click"
+            android:text="Zzz"
+            android:textColor="#ff6600"
+            android:textSize="40dp" />
+
+        <Button
             android:id="@+id/StopButton"
             android:layout_width="match_parent"
             android:layout_height="90dp"
             android:background="@drawable/button_alarm_snooze"
+            android:layout_alignParentBottom="true"
             android:onClick="stopButton_click"
             android:text="X"
             android:textColor="#ff0000"
             android:textSize="40dp" />
-
-        <Button
-            android:id="@+id/SnoozeButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/button_alarm_snooze"
-            android:onClick="snoozeButton_click"
-            android:text="Zz"
-            android:textColor="#ff6600"
-            android:textSize="40dp" />
-
-
     </LinearLayout>
 </LinearLayout>

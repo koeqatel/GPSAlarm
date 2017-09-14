@@ -40,9 +40,9 @@ public class NewAlarm extends Activity {
     String[] ToneFileNameParts; //UFFName
     int Hours = 6;
     int Minutes = 0;
-    int SnoozeDelay;
+    int SnoozeDelay = 15;
     String showdate;
-    boolean cancelSave = false;
+    ArrayList<Boolean> cancelSave = new ArrayList<>();
     ArrayList<Date> dates = new ArrayList<>();
     ArrayList<String> DaysOfWeek = new ArrayList<>();
 
@@ -262,7 +262,7 @@ public class NewAlarm extends Activity {
         }
 
         prepareData(true);
-        if (!cancelSave) {
+        if (!cancelSave.contains(true)) {
             Data.clean();
             Intent intent = new Intent(this, Main.class);
             finish();
@@ -495,9 +495,8 @@ public class NewAlarm extends Activity {
     public void prepareData(boolean saveToFile) {
         File Root = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + BuildConfig.APPLICATION_ID + "/");
         File file = new File(Root, "Alarms.json");
-        cancelSave = false;
         ArrayList<Integer> Ids = new ArrayList<>();
-
+        cancelSave = new ArrayList<>();
         //ReadFile
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -565,15 +564,16 @@ public class NewAlarm extends Activity {
                 Date finaldate = new Date();
                 finaldate.setTime(calendar.getTimeInMillis());
 
+
                 //If the set time is smaller than the current time the alarm won't go off and should not save.
-                if (pickedTime <= currentTime) {
-                    Toast.makeText(this, "Date/Time combination can't be in the past", Toast.LENGTH_SHORT).show();
+                if (pickedTime <= currentTime && !cancelSave.contains(true)) {
+                    if (saveToFile == true)
+                        Toast.makeText(this, "Date/Time combination can't be in the past", Toast.LENGTH_SHORT).show();
                     saveToFile = false;
-                    cancelSave = true;
-                    dates.remove(i);
+                    cancelSave.add(true);
                     removed++;
                 } else {
-                    cancelSave = false;
+                    cancelSave.add(false);
                     dates.set(i - removed, finaldate);
                 }
             }
@@ -630,7 +630,7 @@ public class NewAlarm extends Activity {
         //Tone & Type
         Tone = ToneFullName;
         if (ToneFullName == null) {
-            Type = 0;
+            Type = 2;
             Tone = "";
         } else {
             Type = save_Type;
@@ -668,7 +668,7 @@ public class NewAlarm extends Activity {
         Data.Longitude = Longitude;
         Data.LocationRadius = LocationRadius;
 
-        if (cancelSave == false)
+        if (!cancelSave.contains(true))
             saveData(Id, Name, Snoozedelay, DateTime, Daily, Tone, Volume, Type, Latitude, Longitude, LocationRadius, saveToFile);
 
     }
@@ -737,7 +737,7 @@ public class NewAlarm extends Activity {
 
         SnoozeDelay = _SnoozeDelay;
 
-        if (cal.get(_SnoozeDelay) < 10)
+        if (_SnoozeDelay < 10)
             snoozeDelayButton.setText("0" + _SnoozeDelay);
         else
             snoozeDelayButton.setText("" + _SnoozeDelay);
@@ -773,22 +773,26 @@ public class NewAlarm extends Activity {
         }
 
         //Date & Daily
-        if (_Daily.get(0) != "") {
-            for (int i = 0; i < _Daily.size(); i++) {
-                showdate = showdate + _Daily.get(i) + ", ";
-                DaysOfWeek.add(_Daily.get(i));
+        try {
+            if (_Daily.get(0) != "" || _Daily.get(0) == null) {
+                for (int i = 0; i < _Daily.size(); i++) {
+                    showdate = showdate + _Daily.get(i) + ", ";
+                    DaysOfWeek.add(_Daily.get(i));
+                }
+                showdate = showdate.toString().substring(0, showdate.length() - 2);
+                dateText.setText(showdate);
+            } else {
+                for (int i = 0; i < _DateTime.size(); i++) {
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+                    String dateS = formatter.format(_DateTime.get(i));
+                    showdate = showdate + dateS + ", ";
+                    dates.add(_DateTime.get(i));
+                }
+                showdate = showdate.toString().substring(0, showdate.length() - 2);
+                dateText.setText(showdate);
             }
-            showdate = showdate.toString().substring(0, showdate.length() - 2);
-            dateText.setText(showdate);
-        } else {
-            for (int i = 0; i < _DateTime.size(); i++) {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
-                String dateS = formatter.format(_DateTime.get(i));
-                showdate = showdate + dateS + ", ";
-                dates.add(_DateTime.get(i));
-            }
-            showdate = showdate.toString().substring(0, showdate.length() - 2);
-            dateText.setText(showdate);
+        } catch (IndexOutOfBoundsException e) {
+
         }
 
 

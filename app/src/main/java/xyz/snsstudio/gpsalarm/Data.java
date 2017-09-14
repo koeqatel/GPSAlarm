@@ -14,8 +14,8 @@ public class Data {
     public static Double Latitude;
     public static Double Longitude;
     public static Integer LocationRadius;
-    public static Integer SnoozeDelay;
-    public static Integer SnoozeTimes;
+    public static Integer SnoozeDelay = 0;
+    public static Integer SnoozeTimes = 0;
     public static Boolean Snooze = false;
 
     public static void clean() {
@@ -29,7 +29,7 @@ public class Data {
         Latitude = null;
         Longitude = null;
         LocationRadius = null;
-        SnoozeDelay = null;
+        SnoozeDelay = 0;
         Snooze = false;
         SnoozeTimes = 0;
     }

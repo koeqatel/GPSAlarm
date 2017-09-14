@@ -95,11 +95,14 @@ public class GPSAlarmService extends Service {
                                     for (int i = 0; i < pickedDays.length; i++) {
                                         if (pickedDays[i].equals(currentDay)) {
                                             if (getLocation(picked.getLong("Latitude"), picked.getLong("Longitude"))) {
-                                                if (type == 0 || type == 2) {
+                                                if (type == 0) {
                                                     showAlarm(picked.getString("Name"), picked.getString("Tone"), picked.getInt("Volume"), picked.getInt("SnoozeDelay"), true);
                                                 }
-                                                if (type == 1 || type == 2) {
+                                                if (type == 1) {
                                                     showAlarm(picked.getString("Name"), picked.getString("Tone"), picked.getInt("Volume"), picked.getInt("SnoozeDelay"));
+                                                }
+                                                if (type == 2) {
+                                                    showAlarm(picked.getString("Name"), picked.getString("Tone"), picked.getInt("Volume"), picked.getInt("SnoozeDelay"), true);
                                                 }
                                                 if (type == 3) {
                                                     showNotification(picked.getString("Name"), pickedDays[i]);
@@ -114,11 +117,14 @@ public class GPSAlarmService extends Service {
                                         Date pickedDate = convertToDate(pickedDateTimes[i]);
                                         if (pickedDate.compareTo(currentDate) < 0) {
                                             if (getLocation(Long.parseLong(picked.getString("Latitude")), Long.parseLong(picked.getString("Longitude")))) {
-                                                if (type == 0 || type == 2) {
+                                                if (type == 0) {
                                                     showAlarm(picked.getString("Name"), picked.getString("Tone"), picked.getInt("Volume"), picked.getInt("SnoozeDelay"), true);
                                                 }
-                                                if (type == 1 || type == 2) {
+                                                if (type == 1) {
                                                     showAlarm(picked.getString("Name"), picked.getString("Tone"), picked.getInt("Volume"), picked.getInt("SnoozeDelay"));
+                                                }
+                                                if (type == 2) {
+                                                    showAlarm(picked.getString("Name"), picked.getString("Tone"), picked.getInt("Volume"), picked.getInt("SnoozeDelay"), true);
                                                 }
                                                 if (type == 3) {
                                                     showNotification(picked.getString("Name"), pickedDate);

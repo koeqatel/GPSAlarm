@@ -98,7 +98,6 @@
                     android:layout_gravity="center"
                     android:layout_weight="2"
                     android:background="@null"
-                    android:onClick="timeHourButton_click"
                     android:text="06"
                     android:textAlignment="center"
                     android:textColor="#ffffff" />
@@ -119,7 +118,6 @@
                     android:layout_gravity="center"
                     android:layout_weight="2"
                     android:background="@null"
-                    android:onClick="timeMinuteButton_click"
                     android:text="00"
                     android:textAlignment="center"
                     android:textColor="#ffffff" />
@@ -225,7 +223,6 @@
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:onClick="SnoozeDelayButton_click"
                     android:text="15"
                     android:textAlignment="center"
                     android:textColor="#ffffff" />
